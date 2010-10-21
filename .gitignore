@@ -1,0 +1,12 @@
+settings
+.buildpath
+.cache
+nbproject
+.project
+tools/smarty/compile/*.tpl.php
+tools/smarty/compile/*.tpl
+tools/smarty/cache/*
+.DS_Store
+modules/blockediteurcarte/img/upload/*
+modules/blockediteurcarte/img/upload
+modules/blockediteurcarte/monimage.jpg

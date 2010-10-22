@@ -59,6 +59,8 @@ class MyFtp(Thread):
             ftp.login( self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"))
             try:
                 ftp.mkd(destfile)
+            except error_perm, resp:
+                self.dbg.print_err("Repertoire deja existant .. on passe ", resp)
             finally:
                 ftp.cwd(destfile)
                 

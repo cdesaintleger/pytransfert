@@ -10,3 +10,5 @@ tools/smarty/cache/*
 modules/blockediteurcarte/img/upload/*
 modules/blockediteurcarte/img/upload
 modules/blockediteurcarte/monimage.jpg
+params.ini
+*.jpg

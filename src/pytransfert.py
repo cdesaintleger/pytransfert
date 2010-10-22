@@ -11,6 +11,7 @@ __date__ ="$21 oct. 2010 13:34:48$"
 from bdd import acces_bd
 from transfert import launch
 import threading
+import ConfigParser
 
 
 #############################################
@@ -19,40 +20,52 @@ import threading
 ##                                         ##
 #############################################
 
-def maintimer(tempo = 350):
+def maintimer(tempo):
 
     #Timer par defaut */5 minutes
     threading.Timer(tempo, maintimer, [tempo]).start()
 
-    #connection à la base
+    #lecture du fichier de config
+    conf    =   ConfigParser.ConfigParser()
+    conf.read("params.ini")
+    
+    #instanciation à la base
     sql  =   acces_bd.Sql()
 
     #Paramétres de connection
-    sql.set_db("")
-    sql.set_host("localhost")
-    sql.set_user("")
-    sql.set_password("")
+    sql.set_db(conf.get("DDB", "DATABASE"))
+    sql.set_host(conf.get("DDB", "HOST"))
+    sql.set_user(conf.get("DDB", "USER"))
+    sql.set_password(conf.get("DDB", "PASSWORD"))
     #connection effective
     sql.conn()
 
     #Recupére les images à transferer
     res =   sql.execute("SELECT * FROM ps_bec_liens_crea_cmd WHERE transfert = 0", "select")
-    #compte le nombre de resultats trouvés
-    nbFiles =   len(res)
+    
+    #On marque tout ces fichiers comme "En file"
+    #parcour des fichiers
+    for file in res:
+        print file
+        #ici requete à la ddb pour l'update 
 
 
     #
     #   Pour les test je vais inserer
     #   Manuellement les images à uploader dans le tuple
     #
-    res = res + ('a.jpeg','b.jpag','c.jpeg')
+    res = res + ('a.jpg','b.jpg','c.jpg')
 
+    #compte le nombre de resultats trouvés
+    nbFiles =   len(res)
+    
     #lancement uniquement sil y a des fichiers à uploader
     if( nbFiles > 0 ):
+
         #lancement des transfert par thread
         trans   =   launch.Transfert()
         #Envoie la file à gerer
-        trans.uploadFTP(res)
+        trans.upload_ftp(res)
 
 
 
@@ -64,9 +77,12 @@ def maintimer(tempo = 350):
 #############################################
 if __name__ == "__main__":
 
-    #Lancement main go go go 
-    maintimer(3)
+    #lecture du fichier de config
+    conf    =   ConfigParser.ConfigParser()
+    conf.read("params.ini")
 
+    #Lancement main go go go 
+    maintimer(conf.getint("GLOBAL", "TIMER"))
     
 
 

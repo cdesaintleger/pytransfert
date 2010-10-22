@@ -1,0 +1,15 @@
+; this is an INI file
+[GLOBAL]
+TIMER = temps entre chaque vérification de nouvelles données à uploader
+NBTHREAD = nombre de threads simultanés autorisés
+
+[DDB]
+HOST = ip du serveur sql
+DATABASE = base de donnés
+USER = utilisateur
+PASSWORD = mot de passe
+
+[FTP]
+HOST = ip du serveur ftp
+USER = utilisateur
+PASSWORD = mot de passe

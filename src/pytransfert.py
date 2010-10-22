@@ -20,14 +20,10 @@ import ConfigParser
 ##                                         ##
 #############################################
 
-def maintimer(tempo):
+def maintimer(tempo, trans, conf):
 
     #Timer par defaut */5 minutes
     threading.Timer(tempo, maintimer, [tempo]).start()
-
-    #lecture du fichier de config
-    conf    =   ConfigParser.ConfigParser()
-    conf.read("params.ini")
     
     #instanciation à la base
     sql  =   acces_bd.Sql()
@@ -61,9 +57,7 @@ def maintimer(tempo):
     
     #lancement uniquement sil y a des fichiers à uploader
     if( nbFiles > 0 ):
-
-        #lancement des transfert par thread
-        trans   =   launch.Transfert()
+        
         #Envoie la file à gerer
         trans.upload_ftp(res)
 
@@ -81,8 +75,11 @@ if __name__ == "__main__":
     conf    =   ConfigParser.ConfigParser()
     conf.read("params.ini")
 
+    #Instanciation du transfert par thread
+    trans   =   launch.Transfert()
+
     #Lancement main go go go 
-    maintimer(conf.getint("GLOBAL", "TIMER"))
+    maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf)
     
 
 

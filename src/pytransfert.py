@@ -23,7 +23,7 @@ import ConfigParser
 def maintimer(tempo, trans, conf):
 
     #Timer par defaut */5 minutes
-    threading.Timer(tempo, maintimer, [tempo]).start()
+    threading.Timer(tempo, maintimer, [tempo,trans,conf]).start()
     
     #instanciation à la base
     sql  =   acces_bd.Sql()
@@ -36,28 +36,33 @@ def maintimer(tempo, trans, conf):
     #connection effective
     sql.conn()
 
-    #Recupére les images à transferer
-    res =   sql.execute("SELECT * FROM ps_bec_liens_crea_cmd WHERE transfert = 0", "select")
+    #Recupére les images à transferer ( nouvelles + écouées )
+    res =   sql.execute("\
+        SELECT "+str(conf.get("DDB","CHAMP_ID"))+",\
+        "+str(conf.get("DDB","CHAMP_IMG"))+",\
+        "+str(conf.get("DDB","CHAMP_CMD"))+",\
+        "+str(conf.get("DDB","CHAMP_SOURCE"))+",\
+        "+str(conf.get("DDB","CHAMP_DEST"))+"\
+        FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
+        WHERE "+str(conf.get("DDB","CHAMP_ETAT"))+" in (0,500)")
+
     
-    #On marque tout ces fichiers comme "En file"
     #parcour des fichiers
+    listeid =  list()
+    
     for file in res:
-        print file
-        #ici requete à la ddb pour l'update 
-
-
-    #
-    #   Pour les test je vais inserer
-    #   Manuellement les images à uploader dans le tuple
-    #
-    res = res + ('a.jpg','b.jpg','c.jpg')
+        listeid.append(str(file[0]))
 
     #compte le nombre de resultats trouvés
     nbFiles =   len(res)
     
     #lancement uniquement sil y a des fichiers à uploader
     if( nbFiles > 0 ):
-        
+
+        #On marque tout ces fichiers comme "En file"
+        sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
+
+
         #Envoie la file à gerer
         trans.upload_ftp(res)
 

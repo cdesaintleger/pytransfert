@@ -1,15 +1,27 @@
 ; this is an INI file
 [GLOBAL]
-TIMER = temps entre chaque vérification de nouvelles données à uploader
-NBTHREAD = nombre de threads simultanés autorisés
+TIMER   =   nombre de secondes entre chaque verif de nouveaux fichiers à uploader
+NBTHREAD=   nombre de upload simultané
+
+[LOG]
+LEVEL   =   niveau de log .. pas encore en fonction
+FILENAME=   nom du fichier de log .. pas encore en fonction
 
 [DDB]
-HOST = ip du serveur sql
-DATABASE = base de donnés
-USER = utilisateur
-PASSWORD = mot de passe
+HOST    =   ip serveur mysql
+DATABASE=   nom de la base de données
+USER    =   utilisateur ddb
+PASSWORD=   mot de passe
+
+TBL_ETAT    =   nom de la table qui gére les états des transferts
+CHAMP_ID    =   nom du champ index des fichiers à uploader
+CHAMP_IMG   =   nom de l'image à uploader
+CHAMP_CMD   =   champ de la base qui contient le numero de commande lié au fichier
+CHAMP_SOURCE=   nom du champ de la base qui contient le chemin absolu des fichiers à uploader
+CHAMP_DEST  =   nom du champ de l base qui contien la destination des fichiers à uploder
+CHAMP_ETAT  =   nom du champ contenant l'etat
 
 [FTP]
-HOST = ip du serveur ftp
-USER = utilisateur
-PASSWORD = mot de passe
+HOST    =   adresse ip du serveur FTP distant
+USER    =   login
+PASSWORD=   mot de passe

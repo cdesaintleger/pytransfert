@@ -125,7 +125,7 @@ class MyFtp(Thread):
         ftp.quit()
 
         #debug
-        sleep(15)
+        #sleep(15)
     
 
 

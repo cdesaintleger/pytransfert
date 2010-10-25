@@ -2,7 +2,7 @@
 
 import MySQLdb
 
-class Sql():
+class Sql:
 
     #Paramétre de connection à la db
     __DB  =   ''

@@ -56,12 +56,12 @@ class MyFtp(Thread):
             #envoie du fichier au module FTP
             self._send_file()
 
+            #Changement d'état en base => 3 upload terminé si tout est ok
+            self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 3 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
+
         finally:
             #signalement de la fin de l'upload donc du thread
             print "Fin du thread => ", self.file[1]
-
-            #Changement d'état en base => 3 upload terminé
-            self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 3 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
             #libération du jeton pour laisser la place à un autre
             self.sem.release()

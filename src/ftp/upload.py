@@ -55,7 +55,7 @@ class MyFtp(Thread):
             print "Execution du thread => ", self.file[1]
             #envoie du fichier au module FTP
             cret = self._send_file()
-            print cret
+            
             #test du code retour 0 = OK
             if(cret == 0):
                 #Changement d'état en base => 3 upload terminé si tout est ok

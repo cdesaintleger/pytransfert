@@ -54,10 +54,12 @@ class MyFtp(Thread):
             #jeton acquis , signalement du lancement de l'upload du fichier
             print "Execution du thread => ", self.file[1]
             #envoie du fichier au module FTP
-            self._send_file()
-
-            #Changement d'état en base => 3 upload terminé si tout est ok
-            self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 3 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
+            cret = self._send_file()
+            print cret
+            #test du code retour 0 = OK
+            if(cret == 0):
+                #Changement d'état en base => 3 upload terminé si tout est ok
+                self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 3 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
         finally:
             #signalement de la fin de l'upload donc du thread
@@ -103,9 +105,10 @@ class MyFtp(Thread):
             #Lancement de l'upload proprement dit#
             ftp.storbinary('STOR %s' %self.file[1], f)
 
+            #code retour
+            return 0
+        
         except error_perm, resp:
-
-            print "normalement ca doit le faire ici code 500"
 
             #Changement d'état en base => 500 Probleme de connection ou d'ecriture
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 500 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
@@ -120,14 +123,14 @@ class MyFtp(Thread):
 
             self.dbg.print_err('Erreur : ', resp)
             return 1
+        
+        finally:
 
-        #fermeture du fichier
-        f.close()
-        #cloture de la connection FTP
-        ftp.quit()
+            #fermeture du fichier
+            f.close()
+            #cloture de la connection FTP
+            ftp.quit()
 
-        #debug
-        #sleep(15)
     
 
 

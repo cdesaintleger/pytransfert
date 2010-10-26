@@ -105,6 +105,8 @@ class MyFtp(Thread):
 
         except error_perm, resp:
 
+            print "normalement ca doit le faire ici code 500"
+
             #Changement d'état en base => 500 Probleme de connection ou d'ecriture
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 500 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 

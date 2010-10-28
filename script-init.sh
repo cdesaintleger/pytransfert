@@ -1,16 +1,21 @@
 #!/bin/bash
 
-CHEMIN=/media/psf/www/pytransfert/src/
+CHEMIN=/opt/pytransfert/src/
+NAME=Pytransfert
+DAEMON=pytransfert.py
 
 start() {
-      echo -n "Starting Pytransfert: "
-      cd $CHEMIN
-      pwd 
-      ./pytransfert.py &
+
+        echo -n "Starting $DESC "
+        start-stop-daemon --start --quiet -m --pidfile /var/run/pytransfert.pid \
+        --chdir $CHEMIN -b --exec /opt/pytransfert/src/$DAEMON 1>&2
+        echo "$NAME."
 }
 stop() {
-      echo -n "Stopping Pytransfert: "
-      killall -9 /usr/bin/python
+      echo -n "Stopping $DESC "
+      start-stop-daemon --stop --quiet --pidfile /var/run/pytransfert.pid \
+      --chdir $CHEMIN --exec /usr/local/bin/python2.7
+      echo "$NAME."
 }
 
 case "$1" in
@@ -30,4 +35,3 @@ case "$1" in
   ;;
 esac
 exit 0
-

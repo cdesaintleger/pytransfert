@@ -98,7 +98,8 @@ def cleaner_timer(tempo,conf):
     if( len(res) > 0 ):
         for file in res:
             try:
-                os.remove(file[2]+file[1])
+                print "Nettoyage de : "+file[2]+"/"+file[1]+"\n"
+                os.remove(file[2]+"/"+file[1])
                 #On marque tout ces fichiers comme "nettoyé"
                 sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
                 SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 33 \
@@ -108,7 +109,7 @@ def cleaner_timer(tempo,conf):
                 sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
                 SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 304 \
                 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+str(file[0])+")")
-                warnings.warn("Impossible de supprimer un fichier !")
+                warnings.warn("Impossible de supprimer un fichier !\n")
 
 
 

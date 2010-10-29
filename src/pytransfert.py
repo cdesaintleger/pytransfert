@@ -97,8 +97,11 @@ def cleaner_timer(tempo,conf):
 
     if( len(res) > 0 ):
         for file in res:
+
+            print ("Nettoyage de : "+file[2]+"/"+file[1]+"\n")
+
             try:
-                print "Nettoyage de : "+file[2]+"/"+file[1]+"\n"
+                
                 os.remove(file[2]+"/"+file[1])
                 #On marque tout ces fichiers comme "nettoyé"
                 sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\

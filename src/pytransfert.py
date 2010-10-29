@@ -102,12 +102,12 @@ def cleaner_timer(tempo,conf):
                 #On marque tout ces fichiers comme "nettoyé"
                 sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
                 SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 33 \
-                WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+file[0]+")")
+                WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+str(file[0])+")")
             except:
                 #marque le fichier comme impossible à nettoyer
                 sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
                 SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 304 \
-                WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+file[0]+")")
+                WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+str(file[0])+")")
                 warnings.warn("Impossible de supprimer un fichier !")
 
 

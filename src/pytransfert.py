@@ -99,7 +99,6 @@ def cleaner_timer(tempo,conf):
     if( len(res) > 0 ):
         for file in res:
 
-            print file
             print ("Nettoyage de : "+str(file[2])+"/"+str(file[1])+"\n")
 
             try:

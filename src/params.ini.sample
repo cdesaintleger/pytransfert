@@ -2,6 +2,8 @@
 [GLOBAL]
 TIMER   =   nombre de secondes entre chaque verif de nouveaux fichiers à uploader
 NBTHREAD=   nombre de upload simultané
+CLEANER_TIMER   =   temps entre caque rotation du process de nettoyage
+JOURS_RETENTION =   nombre de jours de retention des fichiers sur le serveur
 
 [LOG]
 LEVEL   =   niveau de log .. pas encore en fonction
@@ -20,6 +22,7 @@ CHAMP_CMD   =   champ de la base qui contient le numero de commande lié au fich
 CHAMP_SOURCE=   nom du champ de la base qui contient le chemin absolu des fichiers à uploader
 CHAMP_DEST  =   nom du champ de l base qui contien la destination des fichiers à uploder
 CHAMP_ETAT  =   nom du champ contenant l'etat
+CHAMP_DATE  =   nom du champ contenant la date d'upload du fichier utilisé pour les nettoyages auto
 
 [FTP]
 HOST    =   adresse ip du serveur FTP distant

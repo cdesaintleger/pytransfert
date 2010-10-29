@@ -12,7 +12,8 @@ from bdd import acces_bd
 from transfert import launch
 import threading
 import ConfigParser
-
+import os
+import warning
 
 #############################################
 ##                                         ##
@@ -68,6 +69,53 @@ def maintimer(tempo, trans, conf):
 
 
 
+#Méthode de nettoyage des fichiers uploadés
+def cleaner_timer(tempo,conf):
+
+    #Timer par defaut */5 minutes
+    threading.Timer(tempo, cleaner_timer, [tempo,conf]).start()
+
+    #instanciation à la base
+    sql  =   acces_bd.Sql()
+
+    #Paramétres de connection
+    sql.set_db(conf.get("DDB", "DATABASE"))
+    sql.set_host(conf.get("DDB", "HOST"))
+    sql.set_user(conf.get("DDB", "USER"))
+    sql.set_password(conf.get("DDB", "PASSWORD"))
+    #connection effective
+    sql.conn()
+
+    #Recupére les images à transferer ( nouvelles + écouées )
+    res =   sql.execute("\
+        SELECT "+str(conf.get("DDB","CHAMP_ID"))+"\
+        "+str(conf.get("DDB","CHAMP_IMG"))+",\
+        "+str(conf.get("DDB","CHAMP_SOURCE"))+"\
+        FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
+        WHERE "+str(conf.get("DDB","CHAMP_ETAT"))+" in (3)\
+        AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > "+str(conf.get("GLOBAL","JOURS_RETENTION")) )
+
+    if( len(res) > 0 ):
+        for res in file:
+            try:
+                os.remove(file[2]+file[1])
+                #On marque tout ces fichiers comme "nettoyé"
+                sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
+                SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 33 \
+                WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+file[0]+")")
+            except:
+                #marque le fichier comme impossible à nettoyer
+                sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
+                SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 304 \
+                WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+file[0]+")")
+                warning.warn("Impossible de supprimer un fichier !")
+
+
+
+
+
+
+
 
 #############################################
 ##                                         ##
@@ -86,5 +134,7 @@ if __name__ == "__main__":
     #Lancement main go go go 
     maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf)
     
+    #Gestion du nettoyae automatique
+    cleaner_timer( conf.getint("GLOBAL","CLEANER_TIMER"),conf )
 
 

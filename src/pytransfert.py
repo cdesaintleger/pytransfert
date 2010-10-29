@@ -13,7 +13,7 @@ from transfert import launch
 import threading
 import ConfigParser
 import os
-import warning
+import warnings
 
 #############################################
 ##                                         ##
@@ -108,7 +108,7 @@ def cleaner_timer(tempo,conf):
                 sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
                 SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 304 \
                 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+file[0]+")")
-                warning.warn("Impossible de supprimer un fichier !")
+                warnings.warn("Impossible de supprimer un fichier !")
 
 
 

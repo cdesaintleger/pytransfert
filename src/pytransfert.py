@@ -88,7 +88,8 @@ def cleaner_timer(tempo,conf):
 
     #Recupére les images à transferer ( nouvelles + écouées )
     res =   sql.execute("\
-        SELECT "+str(conf.get("DDB","CHAMP_ID"))+"\
+        SELECT \
+        "+str(conf.get("DDB","CHAMP_ID"))+",\
         "+str(conf.get("DDB","CHAMP_IMG"))+",\
         "+str(conf.get("DDB","CHAMP_SOURCE"))+"\
         FROM "+str(conf.get("DDB","TBL_ETAT"))+"\

@@ -96,7 +96,7 @@ def cleaner_timer(tempo,conf):
         AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > "+str(conf.get("GLOBAL","JOURS_RETENTION")) )
 
     if( len(res) > 0 ):
-        for res in file:
+        for file in res:
             try:
                 os.remove(file[2]+file[1])
                 #On marque tout ces fichiers comme "nettoyé"

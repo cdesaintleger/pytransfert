@@ -201,7 +201,7 @@ class MyFtp(Thread):
         data['sujet']           =   "CMD "+str(self.file[4])+" : " + str(self.conf.get("NOTIFY","NEWFILESUBJECT"))
 
         # Create the body of the message (a plain-text and an HTML version).
-        data['text'] = "Hi!\nHow are you?\nCommande N° "+str(self.file[4])+" Un nouveau fichier client est arrivé : " +str(self.file[1])+ "\nIl se trouve dans le répertoire réseau pytransfert/"+str(self.file[4])
+        data['text'] = "Hi!\nHow are you?\nCommande N° "+str(self.file[4])+" Un nouveau fichier client est arrivé : " +str(self.file[1])+ "\nIl se trouve dans le répertoire réseau pytransfert"+str(self.file[4])
 
         data['html'] = """\
         <html>
@@ -211,7 +211,7 @@ class MyFtp(Thread):
                How are you?<br>
                <h3>Commande N° """+str(self.file[4])+"""</h3>
                Un nouveau fichier client est arrivé : <b>""" +str(self.file[1])+ """</b><br>
-               Il se trouve dans le répertoire réseau <b>pytransfert/"""+str(self.file[4])+"""</b>
+               Il se trouve dans le répertoire réseau <b>pytransfert"""+str(self.file[4])+"""</b>
             </p>
           </body>
         </html>

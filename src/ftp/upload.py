@@ -192,6 +192,9 @@ class MyFtp(Thread):
     #Recupére les infos pour l'expédition de mail à l'arrive d'un nouveau fichier
     def _data_newfilenotify(self):
 
+        #definition du dictionaire
+        data    =   {}
+
         data['from']    =   str(self.conf.get("NOTIFY","NEWFILEFROM"))
         data['destinataires']    =   str(self.conf.get("NOTIFY","NEWFILEDEST"))
         data['sujet']           =   str(self.conf.get("NOTIFY","NEWFILESUBJECT"))
@@ -214,6 +217,9 @@ class MyFtp(Thread):
 
     #Recupére les infos pour l'expédition de mail à l'arrive d'un probléme
     def _data_emergencynotify(self):
+
+        #definition du dictionaire
+        data    =   {}
 
         data['from']    =   str(self.conf.get("NOTIFY","EMERGENCYFROM"))
         data['destinataires']    =   str(self.conf.get("NOTIFY","EMERGENCYDEST"))

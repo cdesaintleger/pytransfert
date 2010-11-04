@@ -153,7 +153,7 @@ class MyFtp(Thread):
     def notify_by_mail(self,mail_type):
 
 
-        maildata    =   self._dispatch(mail_type)
+        maildata    =   self._dispatch("_" + str(mail_type))
 
         # me == my email address
         # you == recipient's email address

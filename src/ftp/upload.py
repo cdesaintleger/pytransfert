@@ -153,7 +153,7 @@ class MyFtp(Thread):
     def notify_by_mail(self,mail_type):
 
 
-        maildata    =   self._dispatch("_" + str(mail_type))
+        maildata    =   self._dispatch(mail_type)
 
         # me == my email address
         # you == recipient's email address
@@ -189,51 +189,51 @@ class MyFtp(Thread):
 
 
 
-        #Recupére les infos pour l'expédition de mail à l'arrive d'un nouveau fichier
-        def _data_newfilenotify(self):
+    #Recupére les infos pour l'expédition de mail à l'arrive d'un nouveau fichier
+    def _data_newfilenotify(self):
 
-            data['from']    =   str(self.conf.get("NOTIFY","NEWFILEFROM"))
-            data['destinataires']    =   str(self.conf.get("NOTIFY","NEWFILEDEST"))
-            data['sujet']           =   str(self.conf.get("NOTIFY","NEWFILESUBJECT"))
+        data['from']    =   str(self.conf.get("NOTIFY","NEWFILEFROM"))
+        data['destinataires']    =   str(self.conf.get("NOTIFY","NEWFILEDEST"))
+        data['sujet']           =   str(self.conf.get("NOTIFY","NEWFILESUBJECT"))
 
-            # Create the body of the message (a plain-text and an HTML version).
-            data['text'] = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://www.python.org"
-            data['html'] = """\
-            <html>
-              <head></head>
-              <body>
-                <p>Hi!<br>
-                   How are you?<br>
-                   Here is the <a href="http://www.python.org">link</a> you wanted.
-                </p>
-              </body>
-            </html>
-            """
+        # Create the body of the message (a plain-text and an HTML version).
+        data['text'] = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://www.python.org"
+        data['html'] = """\
+        <html>
+          <head></head>
+          <body>
+            <p>Hi!<br>
+               How are you?<br>
+               Here is the <a href="http://www.python.org">link</a> you wanted.
+            </p>
+          </body>
+        </html>
+        """
 
-            return data
+        return data
 
-        #Recupére les infos pour l'expédition de mail à l'arrive d'un probléme 
-        def _data_emergencynotify(self):
+    #Recupére les infos pour l'expédition de mail à l'arrive d'un probléme
+    def _data_emergencynotify(self):
 
-            data['from']    =   str(self.conf.get("NOTIFY","EMERGENCYFROM"))
-            data['destinataires']    =   str(self.conf.get("NOTIFY","EMERGENCYDEST"))
-            data['sujet']           =   str(self.conf.get("NOTIFY","EMERGENCYSUBJECT"))
+        data['from']    =   str(self.conf.get("NOTIFY","EMERGENCYFROM"))
+        data['destinataires']    =   str(self.conf.get("NOTIFY","EMERGENCYDEST"))
+        data['sujet']           =   str(self.conf.get("NOTIFY","EMERGENCYSUBJECT"))
 
-            # Create the body of the message (a plain-text and an HTML version).
-            data['text'] = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://www.python.org"
-            data['html'] = """\
-            <html>
-              <head></head>
-              <body>
-                <p>Hi!<br>
-                   How are you?<br>
-                   Here is the <a href="http://www.python.org">link</a> you wanted.
-                </p>
-              </body>
-            </html>
-            """
+        # Create the body of the message (a plain-text and an HTML version).
+        data['text'] = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://www.python.org"
+        data['html'] = """\
+        <html>
+          <head></head>
+          <body>
+            <p>Hi!<br>
+               How are you?<br>
+               Here is the <a href="http://www.python.org">link</a> you wanted.
+            </p>
+          </body>
+        </html>
+        """
 
-            return data
+        return data
 
 
 

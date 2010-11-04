@@ -155,13 +155,13 @@ class MyFtp(Thread):
         print "Expedition du mail de notification \n"
 
         maildata    =   self._dispatch(mail_type)
-        print maildata
+        
         # me == my email address
         # you == recipient's email address
         me = maildata.get("from","pytransfert@rapid-flyer.com")
 
         #recupére les adresses selon le type de mail à envoyer ( data_newfilenotify , data_emergencynotify )
-        you =   maildata.get("destinataire","cdesaintleger@creavi.fr")
+        you =   maildata.get("destinataires","cdesaintleger@creavi.fr")
 
 
         # Create message container - the correct MIME type is multipart/alternative.
@@ -201,14 +201,17 @@ class MyFtp(Thread):
         data['sujet']           =   str(self.conf.get("NOTIFY","NEWFILESUBJECT"))
 
         # Create the body of the message (a plain-text and an HTML version).
-        data['text'] = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://www.python.org"
+        data['text'] = "Hi!\nHow are you?\nCommande N° "+str(self.file[4])+" Un nouveau fichier client est arrivé : " +str(self.file[1])+ "\nIl se trouve dans le répertoire réseau pytransfert/"+str(self.file[4])
+
         data['html'] = """\
         <html>
           <head></head>
           <body>
             <p>Hi!<br>
                How are you?<br>
-               Here is the <a href="http://www.python.org">link</a> you wanted.
+               <h3>Commande N° """+str(self.file[4])+"""</h3>
+               Un nouveau fichier client est arrivé : """ +str(self.file[1])+ """<br>
+               Il se trouve dans le répertoire réseau <b>pytransfert/"""+str(self.file[4])+"""</b>
             </p>
           </body>
         </html>

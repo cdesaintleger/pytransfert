@@ -155,13 +155,13 @@ class MyFtp(Thread):
         print "Expedition du mail de notification \n"
 
         maildata    =   self._dispatch(mail_type)
-
+        print maildata
         # me == my email address
         # you == recipient's email address
         me = maildata.get("from","pytransfert@rapid-flyer.com")
 
         #recupére les adresses selon le type de mail à envoyer ( data_newfilenotify , data_emergencynotify )
-        you =   maildata.get("destinataire","pytransfert@rapid-flyer.com")
+        you =   maildata.get("destinataire","cdesaintleger@creavi.fr")
 
 
         # Create message container - the correct MIME type is multipart/alternative.

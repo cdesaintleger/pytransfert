@@ -152,6 +152,7 @@ class MyFtp(Thread):
     #Notification par mail de l'arrivé des fichiers ou d'un probléme quelconque
     def notify_by_mail(self,mail_type):
 
+        print "Expedition du mail de notification \n"
 
         maildata    =   self._dispatch(mail_type)
 

@@ -28,3 +28,12 @@ CHAMP_DATE  =   nom du champ contenant la date d'upload du fichier utilisé pour
 HOST    =   adresse ip du serveur FTP distant
 USER    =   login
 PASSWORD=   mot de passe
+
+[NOTIFY]
+NEWFILEFROM =   pytransfert@rapid-flyer.com
+NEWFILEDEST =   cdesaintleger@creavi.fr
+NEWFILESUBJECT  =   Un nouveau fichier est arrivé
+
+EMERGENCYFROM   =   pytransfert@rapid-flyer.com
+EMERGENCYDEST   =   cdesaintleger@creavi.fr
+EMERGENCYSUBJECT=   Anomalie detecté 

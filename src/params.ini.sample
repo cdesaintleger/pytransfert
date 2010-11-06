@@ -30,10 +30,10 @@ USER    =   login
 PASSWORD=   mot de passe
 
 [NOTIFY]
-NEWFILEFROM =   pytransfert@rapid-flyer.com
-NEWFILEDEST =   cdesaintleger@creavi.fr
-NEWFILESUBJECT  =   Un nouveau fichier est arrivé
+NEWFILEFROM =   adresse de l'expediteur pour la notification nouveau fichier
+NEWFILEDEST =   adresse du destinataire pour la notification nouveau fichier
+NEWFILESUBJECT  =   sujet
 
-EMERGENCYFROM   =   pytransfert@rapid-flyer.com
-EMERGENCYDEST   =   cdesaintleger@creavi.fr
-EMERGENCYSUBJECT=   Anomalie detecté 
+EMERGENCYFROM   =   adresse de l'expediteur pour la detection d'anomalie
+EMERGENCYDEST   =   adresse du destinataire pour la detection d'anomalie
+EMERGENCYSUBJECT=   sujet

@@ -100,6 +100,9 @@ class MyFtp(Thread):
             #Changement d'état en base => 404 Fichier introuvable
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 404 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
+            #notification erreur
+            self.notify_by_mail('data_emergencynotify')
+
             #quit la fonction
             return 1
 
@@ -131,6 +134,10 @@ class MyFtp(Thread):
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 500 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
             self.dbg.print_err('Erreur : ', resp)
+
+            #notification erreur
+            self.notify_by_mail('data_emergencynotify')
+
             return 1
 
         except all_errors, resp:
@@ -139,6 +146,10 @@ class MyFtp(Thread):
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 500 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
             self.dbg.print_err('Erreur : ', resp)
+
+            #notification erreur
+            self.notify_by_mail('data_emergencynotify')
+            
             return 1
         
         finally:
@@ -205,7 +216,9 @@ class MyFtp(Thread):
 
         data['html'] = """\
         <html>
-          <head></head>
+          <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+          </head>
           <body>
             <p>Hi!<br>
                How are you?<br>
@@ -230,14 +243,19 @@ class MyFtp(Thread):
         data['sujet']           =   str(self.conf.get("NOTIFY","EMERGENCYSUBJECT"))
 
         # Create the body of the message (a plain-text and an HTML version).
-        data['text'] = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://www.python.org"
+        data['text'] = "Erreur de transfert Pytransfert\nMerci de vous rapprocher de christophe cdesaintleger@creavi.fr pour vérifier les connexions "
         data['html'] = """\
         <html>
-          <head></head>
+          <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+          </head>
           <body>
             <p>Hi!<br>
-               How are you?<br>
-               Here is the <a href="http://www.python.org">link</a> you wanted.
+               Un probléme vient d'être signalé sur le transfert d'un fichier .<br>
+               Merci de vérifier la connexion au serveur FTP<br>
+               <b>83.206.237.107</b><br/><br/>
+               <h3>Commande N° """+str(self.file[4])+"""</h3>
+               Fichier concerné : <b>""" +str(self.file[1])+ """</b><br>
             </p>
           </body>
         </html>

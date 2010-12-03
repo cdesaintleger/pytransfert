@@ -15,6 +15,12 @@ import ConfigParser
 #ddb
 from bdd import acces_bd
 
+#logging
+from time import strftime, gmtime
+import logging
+import logging.handlers
+
+
 #mails
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -51,13 +57,28 @@ class MyFtp(Thread):
         self.sql.set_user(self.conf.get("DDB", "USER"))
         self.sql.set_password(self.conf.get("DDB", "PASSWORD"))
         #connection effective
-        self.sql.conn()      
+        self.sql.conn()
+
+        #mise en place du logger
+        LOG_FILENAME = 'log/pytransfert.out'
+
+        # Set up a specific logger with our desired output level
+        self.logger = logging.getLogger('pyTransfert')
+        self.logger.setLevel(logging.DEBUG)
+
+        # Add the log message handler to the logger
+        self.handler = logging.handlers.RotatingFileHandler(
+                      LOG_FILENAME, maxBytes=16777216, backupCount=5)
+
+        self.logger.addHandler(self.handler)
+
 
     #action du thread ( start )
     def run(self):
 
         #Signale que l'on met en file le fichier
-        print "Attente du thread => ", self.file[1]
+        self.logger.info("%s -- INFO -- Attente du thread -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+        
         #aquisition d'un jeton ( semaphore ) ou attente d'une libération
         self.sem.acquire()
 
@@ -66,21 +87,32 @@ class MyFtp(Thread):
 
         try:
             #jeton acquis , signalement du lancement de l'upload du fichier
-            print "Execution du thread => ", self.file[1]
+            self.logger.info("%s -- INFO -- Execution du thread -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+
             #envoie du fichier au module FTP
             cret = self._send_file()
             
             #test du code retour 0 = OK
             if(cret == 0):
+                
                 #Changement d'état en base => 3 upload terminé si tout est ok
                 self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 3 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
                 #notification 
                 self.notify_by_mail('data_newfilenotify')
+                self.logger.info("%s -- INFO -- Notify new file -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+
+            else:
+                #remet l'etat du fichier à 0 pour reesayer
+                self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 0 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
+
+                #notification 
+                self.notify_by_mail('data_retryfilenotify')
+                self.logger.info("%s -- ERR -- Notify retry file -- %s"% (strftime('%c',gmtime()), self.file[1]) )
 
         finally:
             #signalement de la fin de l'upload donc du thread
-            print "Fin du thread => ", self.file[1]
+            self.logger.info("%s -- INFO -- Fin du thread -- %s"% (strftime('%c',gmtime()), self.file[1]) )
 
             #libération du jeton pour laisser la place à un autre
             self.sem.release()
@@ -93,15 +125,17 @@ class MyFtp(Thread):
         try:
             #ouverture du fichier data
             f = open(self.file[3]+self.file[1],'rb')
+            
         except IOError:
             #erreur à l'ouverture du fichier
-            self.dbg.print_err('sendFile','error opening [%s]' % self.file[1])
+            self.logger.info('%s -- ERR -- sendFile error opening [%s] -- etat devient 404' % (strftime('%c',gmtime()), self.file[1]) )
 
             #Changement d'état en base => 404 Fichier introuvable
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 404 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
             #notification erreur
             self.notify_by_mail('data_emergencynotify')
+            self.logger.info("%s -- INFO -- Notify error -- %s"% (strftime('%c',gmtime()), self.file[1]) )
 
             #quit la fonction
             return 1
@@ -114,14 +148,20 @@ class MyFtp(Thread):
             ftp.login( self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"))
             try:
                 #creation du repertoire destination
+                self.logger.info("%s -- INFO -- Creation repertoire -- %s"% (strftime('%c',gmtime()), self.file[4]) )
                 ftp.mkd(self.file[4])
+
             except error_perm, resp:
+
                 #si le repertoire existe déjà .. on signale et on passe
-                self.dbg.print_err("Repertoire deja existant .. on passe ", resp)
+                self.logger.info("%s -- WARN -- Repertoire deja existant -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+
             finally:
+
                 #on se déplace dans le repertoire finale
                 ftp.cwd(self.file[4])
 
+            self.logger.info("%s -- INFO -- Depot du fichier -- %s"% (strftime('%c',gmtime()), self.file[1]) )
             #Lancement de l'upload proprement dit#
             ftp.storbinary('STOR %s' %self.file[1], f)
 
@@ -133,9 +173,10 @@ class MyFtp(Thread):
             #Changement d'état en base => 500 Probleme de connection ou d'ecriture
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 500 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
-            self.dbg.print_err('Erreur : ', resp)
+            self.logger.info("%s -- ERR -- %s etat devient 500 -- %s"% (strftime('%c',gmtime()), resp, self.file[1]) )
 
             #notification erreur
+            self.logger.info("%s -- INFO -- Notify error -- %s"% (strftime('%c',gmtime()), self.file[1]) )
             self.notify_by_mail('data_emergencynotify')
 
             return 1
@@ -145,9 +186,10 @@ class MyFtp(Thread):
             #Changement d'état en base => 500 Probleme de connection ou d'ecriture
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 500 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
-            self.dbg.print_err('Erreur : ', resp)
+            self.logger.info("%s -- ERR -- %s etat devient 500 -- %s"% (strftime('%c',gmtime()), resp, self.file[1]) )
 
             #notification erreur
+            self.logger.info("%s -- INFO -- Notify error -- %s"% (strftime('%c',gmtime()), self.file[1]) )
             self.notify_by_mail('data_emergencynotify')
             
             return 1
@@ -155,15 +197,15 @@ class MyFtp(Thread):
         finally:
 
             #fermeture du fichier
+            self.logger.info("%s -- INFO -- Fermeture du fichier -- %s"% (strftime('%c',gmtime()), self.file[1]) )
             f.close()
             #cloture de la connection FTP
+            self.logger.info("%s -- INFO -- Deconnection du FTP -- %s"% (strftime('%c',gmtime()), self.file[1]) )
             ftp.quit()
 
 
     #Notification par mail de l'arrivé des fichiers ou d'un probléme quelconque
     def notify_by_mail(self,mail_type):
-
-        print "Expedition du mail de notification \n"
 
         maildata    =   self._dispatch(mail_type)
         
@@ -263,7 +305,36 @@ class MyFtp(Thread):
 
         return data
 
+    #Recupére les infos pour l'expédition de mail à l'arrive d'un probléme pendant le transfert
+    def _data_retryfilenotify(self):
 
+        #definition du dictionaire
+        data    =   {}
+
+        data['from']    =   str(self.conf.get("NOTIFY","EMERGENCYFROM"))
+        data['destinataires']    =   str(self.conf.get("NOTIFY","EMERGENCYDEST"))
+        data['sujet']           =   str(self.conf.get("NOTIFY","EMERGENCYSUBJECT"))
+
+        # Create the body of the message (a plain-text and an HTML version).
+        data['text'] = "Erreur pedant transfert Pytransfert\nMerci de vous rapprocher de christophe cdesaintleger@creavi.fr pour vérifier les connexions "
+        data['html'] = """\
+        <html>
+          <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+          </head>
+          <body>
+            <p>Hi!<br>
+               Un probléme vient d'être signalé sur le transfert d'un fichier .<br>
+               Merci de vérifier la connexion au serveur FTP<br>
+               <b>83.206.237.107</b><br/><br/>
+               <h3>Commande N° """+str(self.file[4])+"""</h3>
+               Fichier concerné : <b>""" +str(self.file[1])+ """</b><br>
+            </p>
+          </body>
+        </html>
+        """
+
+        return data
 
 
 

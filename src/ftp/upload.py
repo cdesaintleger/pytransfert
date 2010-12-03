@@ -6,9 +6,6 @@ from threading import Thread
 #ftp
 from ftplib import FTP, error_perm, all_errors
 
-#log
-from Debug import Debug
-
 #Fichier de config
 import ConfigParser
 
@@ -37,9 +34,6 @@ class MyFtp(Thread):
         #lecture du fichier de config
         self.conf    =   ConfigParser.ConfigParser()
         self.conf.read("params.ini")
-
-        #mod debug
-        self.dbg = Debug.Debug('MyFTP')
 
         #recupération de jetons ( semaphore )
         self.sem = sem

@@ -9,3 +9,58 @@ Fri Dec  3 13:45:17 2010 -- INFO -- Attente du thread -- logo.jpg
 Fri Dec  3 13:45:17 2010 -- INFO -- Attente du thread -- logo.jpg
 Fri Dec  3 13:45:17 2010 -- INFO -- Execution du thread -- logo.jpg
 Fri Dec  3 13:45:17 2010 -- INFO -- Execution du thread -- logo.jpg
+Fri Dec  3 17:09:47 2010 -- INFO -- Attente du thread -- logo11.jpg
+Fri Dec  3 17:09:47 2010 -- INFO -- Execution du thread -- logo11.jpg
+Fri Dec  3 17:09:48 2010 -- INFO -- Creation repertoire -- /rf111111/
+Fri Dec  3 17:09:48 2010 -- WARN -- Repertoire deja existant -- logo11.jpg
+Fri Dec  3 17:09:48 2010 -- INFO -- Depot du fichier -- logo11.jpg
+Fri Dec  3 17:09:49 2010 -- INFO -- Fermeture du fichier -- logo11.jpg
+Fri Dec  3 17:09:49 2010 -- INFO -- Deconnection du FTP -- logo11.jpg
+Fri Dec  3 17:09:49 2010 -- INFO -- Notify new file -- logo11.jpg
+Fri Dec  3 17:09:49 2010 -- INFO -- Fin du thread -- logo11.jpg
+Fri Dec  3 17:13:32 2010 -- INFO -- Attente du thread -- 000021-1.pdf
+Fri Dec  3 17:13:32 2010 -- INFO -- Execution du thread -- 000021-1.pdf
+Fri Dec  3 17:13:33 2010 -- INFO -- Creation repertoire -- /rf111111/
+Fri Dec  3 17:13:33 2010 -- WARN -- Repertoire deja existant -- 000021-1.pdf
+Fri Dec  3 17:13:33 2010 -- INFO -- Depot du fichier -- 000021-1.pdf
+Fri Dec  3 17:13:34 2010 -- ERR -- 75) etat devient 500 -- 000021-1.pdf
+Fri Dec  3 17:13:34 2010 -- INFO -- Notify error -- 000021-1.pdf
+Fri Dec  3 17:13:34 2010 -- INFO -- Fermeture du fichier -- 000021-1.pdf
+Fri Dec  3 17:13:34 2010 -- INFO -- Deconnection du FTP -- 000021-1.pdf
+Fri Dec  3 17:13:35 2010 -- INFO -- Fin du thread -- 000021-1.pdf
+Fri Dec  3 17:14:17 2010 -- INFO -- Attente du thread -- 000021-1.pdf
+Fri Dec  3 17:14:17 2010 -- INFO -- Execution du thread -- 000021-1.pdf
+Fri Dec  3 17:14:18 2010 -- INFO -- Creation repertoire -- /rf111111/
+Fri Dec  3 17:14:18 2010 -- WARN -- Repertoire deja existant -- 000021-1.pdf
+Fri Dec  3 17:14:18 2010 -- INFO -- Depot du fichier -- 000021-1.pdf
+Fri Dec  3 17:14:19 2010 -- INFO -- Fermeture du fichier -- 000021-1.pdf
+Fri Dec  3 17:14:19 2010 -- INFO -- Deconnection du FTP -- 000021-1.pdf
+Fri Dec  3 17:14:19 2010 -- INFO -- Notify new file -- 000021-1.pdf
+Fri Dec  3 17:14:19 2010 -- INFO -- Fin du thread -- 000021-1.pdf
+Fri Dec  3 17:26:53 2010 -- INFO -- Attente du thread -- devis-2-fELMNVZ3.pdf
+Fri Dec  3 17:26:53 2010 -- INFO -- Execution du thread -- devis-2-fELMNVZ3.pdf
+Fri Dec  3 17:26:54 2010 -- INFO -- Creation repertoire -- /rf111111/
+Fri Dec  3 17:26:54 2010 -- WARN -- Repertoire deja existant -- devis-2-fELMNVZ3.pdf
+Fri Dec  3 17:26:54 2010 -- INFO -- Depot du fichier -- devis-2-fELMNVZ3.pdf
+Fri Dec  3 17:26:55 2010 -- INFO -- Fermeture du fichier -- devis-2-fELMNVZ3.pdf
+Fri Dec  3 17:26:55 2010 -- INFO -- Deconnection du FTP -- devis-2-fELMNVZ3.pdf
+Fri Dec  3 17:26:55 2010 -- INFO -- Notify new file -- devis-2-fELMNVZ3.pdf
+Fri Dec  3 17:26:55 2010 -- INFO -- Fin du thread -- devis-2-fELMNVZ3.pdf
+Fri Dec  3 17:33:19 2010 -- INFO -- Attente du thread -- devis-2-bknvBXY8.pdf
+Fri Dec  3 17:33:19 2010 -- INFO -- Execution du thread -- devis-2-bknvBXY8.pdf
+Fri Dec  3 17:33:19 2010 -- INFO -- Attente du thread -- devis-2-cexFKM13.pdf
+Fri Dec  3 17:33:19 2010 -- INFO -- Execution du thread -- devis-2-cexFKM13.pdf
+Fri Dec  3 17:33:19 2010 -- INFO -- Creation repertoire -- /rf111111/
+Fri Dec  3 17:33:19 2010 -- WARN -- Repertoire deja existant -- devis-2-cexFKM13.pdf
+Fri Dec  3 17:33:19 2010 -- INFO -- Depot du fichier -- devis-2-cexFKM13.pdf
+Fri Dec  3 17:33:21 2010 -- INFO -- Fermeture du fichier -- devis-2-cexFKM13.pdf
+Fri Dec  3 17:33:21 2010 -- INFO -- Deconnection du FTP -- devis-2-cexFKM13.pdf
+Fri Dec  3 17:33:21 2010 -- INFO -- Notify new file -- devis-2-cexFKM13.pdf
+Fri Dec  3 17:33:21 2010 -- INFO -- Fin du thread -- devis-2-cexFKM13.pdf
+Fri Dec  3 17:33:24 2010 -- INFO -- Creation repertoire -- /rf111111/
+Fri Dec  3 17:33:25 2010 -- WARN -- Repertoire deja existant -- devis-2-bknvBXY8.pdf
+Fri Dec  3 17:33:25 2010 -- INFO -- Depot du fichier -- devis-2-bknvBXY8.pdf
+Fri Dec  3 17:33:27 2010 -- INFO -- Fermeture du fichier -- devis-2-bknvBXY8.pdf
+Fri Dec  3 17:33:27 2010 -- INFO -- Deconnection du FTP -- devis-2-bknvBXY8.pdf
+Fri Dec  3 17:33:27 2010 -- INFO -- Notify new file -- devis-2-bknvBXY8.pdf
+Fri Dec  3 17:33:27 2010 -- INFO -- Fin du thread -- devis-2-bknvBXY8.pdf

@@ -15,27 +15,20 @@ import ConfigParser
 import os
 import warnings
 
+#logging
+import logging
+import logging.handlers
+
 #############################################
 ##                                         ##
 ##                  MAIN                   ##
 ##                                         ##
 #############################################
 
-def maintimer(tempo, trans, conf):
+def maintimer(tempo, trans, conf, logger, sql):
 
     #Timer par defaut */5 minutes
-    threading.Timer(tempo, maintimer, [tempo,trans,conf]).start()
-    
-    #instanciation à la base
-    sql  =   acces_bd.Sql()
-
-    #Paramétres de connection
-    sql.set_db(conf.get("DDB", "DATABASE"))
-    sql.set_host(conf.get("DDB", "HOST"))
-    sql.set_user(conf.get("DDB", "USER"))
-    sql.set_password(conf.get("DDB", "PASSWORD"))
-    #connection effective
-    sql.conn()
+    threading.Timer(tempo, maintimer, [tempo,trans,conf,logger,sql]).start()
 
     #Recupére les images à transferer ( nouvelles + écouées )
     res =   sql.execute("\
@@ -65,26 +58,15 @@ def maintimer(tempo, trans, conf):
 
 
         #Envoie la file à gerer
-        trans.upload_ftp(res)
+        trans.upload_ftp(res,logger,sql,conf)
 
 
 
 #Méthode de nettoyage des fichiers uploadés
-def cleaner_timer(tempo,conf):
+def cleaner_timer(tempo,conf,sql):
 
     #Timer par defaut */5 minutes
-    threading.Timer(tempo, cleaner_timer, [tempo,conf]).start()
-
-    #instanciation à la base
-    sql  =   acces_bd.Sql()
-
-    #Paramétres de connection
-    sql.set_db(conf.get("DDB", "DATABASE"))
-    sql.set_host(conf.get("DDB", "HOST"))
-    sql.set_user(conf.get("DDB", "USER"))
-    sql.set_password(conf.get("DDB", "PASSWORD"))
-    #connection effective
-    sql.conn()
+    threading.Timer(tempo, cleaner_timer, [tempo,conf,sql]).start()
 
     #Recupére les images à transferer ( nouvelles + écouées )
     res =   sql.execute("\
@@ -133,13 +115,45 @@ if __name__ == "__main__":
     conf    =   ConfigParser.ConfigParser()
     conf.read("params.ini")
 
+
+
+    #mise en place du logger
+    LOG_FILENAME = 'log/pytransfert.out'
+
+    # Set up a specific logger with our desired output level
+    logger = logging.getLogger('pyTransfert')
+    logger.setLevel(logging.DEBUG)
+
+    # Add the log message handler to the logger
+    handler = logging.handlers.RotatingFileHandler(
+                  LOG_FILENAME, maxBytes=16777216, backupCount=5)
+
+    logger.addHandler(handler)
+
+
+
+
+    #instanciation à la base
+    sql  =   acces_bd.Sql()
+
+    #Paramétres de connection
+    sql.set_db(conf.get("DDB", "DATABASE"))
+    sql.set_host(conf.get("DDB", "HOST"))
+    sql.set_user(conf.get("DDB", "USER"))
+    sql.set_password(conf.get("DDB", "PASSWORD"))
+    #connection effective
+    sql.conn()
+
+
+
+
     #Instanciation du transfert par thread
     trans   =   launch.Transfert()
 
     #Lancement main go go go 
-    maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf)
+    maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf, logger, sql)
     
     #Gestion du nettoyae automatique
-    cleaner_timer( conf.getint("GLOBAL","CLEANER_TIMER"),conf )
+    cleaner_timer( conf.getint("GLOBAL","CLEANER_TIMER"),conf,sql )
 
 

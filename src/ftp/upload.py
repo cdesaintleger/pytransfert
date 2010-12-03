@@ -6,16 +6,8 @@ from threading import Thread
 #ftp
 from ftplib import FTP, error_perm, all_errors
 
-#Fichier de config
-import ConfigParser
-
-#ddb
-from bdd import acces_bd
-
 #logging
 from time import strftime, gmtime
-import logging
-import logging.handlers
 
 
 #mails
@@ -26,14 +18,13 @@ from email.mime.text import MIMEText
 
 class MyFtp(Thread):
 
-    def __init__(self,sem,file):
+    def __init__(self,sem,file,logger,sql,conf):
 
         #initialisation du thread
         Thread.__init__(self)
 
         #lecture du fichier de config
-        self.conf    =   ConfigParser.ConfigParser()
-        self.conf.read("params.ini")
+        self.conf    =   conf
 
         #recupération de jetons ( semaphore )
         self.sem = sem
@@ -42,30 +33,10 @@ class MyFtp(Thread):
         self.file   =   file
 
         #Connexion SQL pour la changement des etats
-        #instanciation à la base
-        self.sql  =   acces_bd.Sql()
-
-        #Paramétres de connection
-        self.sql.set_db(self.conf.get("DDB", "DATABASE"))
-        self.sql.set_host(self.conf.get("DDB", "HOST"))
-        self.sql.set_user(self.conf.get("DDB", "USER"))
-        self.sql.set_password(self.conf.get("DDB", "PASSWORD"))
-        #connection effective
-        self.sql.conn()
+        self.sql = sql
 
         #mise en place du logger
-        LOG_FILENAME = 'log/pytransfert.out'
-
-        # Set up a specific logger with our desired output level
-        self.logger = logging.getLogger('pyTransfert')
-        self.logger.setLevel(logging.DEBUG)
-
-        # Add the log message handler to the logger
-        self.handler = logging.handlers.RotatingFileHandler(
-                      LOG_FILENAME, maxBytes=16777216, backupCount=5)
-
-        self.logger.addHandler(self.handler)
-
+        self.logger=logger
 
     #action du thread ( start )
     def run(self):

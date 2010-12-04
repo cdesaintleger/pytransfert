@@ -127,9 +127,22 @@ class MyFtp(Thread):
                 #on se déplace dans le repertoire finale
                 ftp.cwd(self.file[4])
 
+                #info du lancement d'upload du fichier
                 self.logger.info("%s -- INFO -- Depot du fichier -- %s"% (strftime('%c',gmtime()), self.file[1]) )
-                #Lancement de l'upload proprement dit#
-                ftp.storbinary('STOR %s' %self.file[1], f)#ca bloque ici
+                
+                try:
+
+                    #Lancement de l'upload proprement dit#
+                    ftp.storbinary('STOR %s' %self.file[1], f)
+
+                except all_errors, resp:
+
+                    #remet l'etat du fichier à 0 pour reesayer
+                    self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 0 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
+
+                    self.logger.info("%s -- ERR -- %s etat devient 0 Erreur transfert du fichier -- %s"% (strftime('%c',gmtime()), resp, self.file[1]) )
+                    #Retour erreur
+                    return 1
 
             #code retour
             return 0

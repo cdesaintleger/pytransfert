@@ -111,6 +111,7 @@ class MyFtp(Thread):
             ftp =   FTP( self.conf.get("FTP", "HOST") )
             #Login avec user <-> password
             ftp.login( self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"))
+            
             try:
                 #creation du repertoire destination
                 self.logger.info("%s -- INFO -- Creation repertoire -- %s"% (strftime('%c',gmtime()), self.file[4]) )
@@ -126,9 +127,9 @@ class MyFtp(Thread):
                 #on se déplace dans le repertoire finale
                 ftp.cwd(self.file[4])
 
-            self.logger.info("%s -- INFO -- Depot du fichier -- %s"% (strftime('%c',gmtime()), self.file[1]) )
-            #Lancement de l'upload proprement dit#
-            ftp.storbinary('STOR %s' %self.file[1], f)
+                self.logger.info("%s -- INFO -- Depot du fichier -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+                #Lancement de l'upload proprement dit#
+                ftp.storbinary('STOR %s' %self.file[1], f)#ca bloque ici
 
             #code retour
             return 0

@@ -13,3 +13,4 @@ modules/blockediteurcarte/monimage.jpg
 params.ini
 *.jpg
 *.pyc
+*.out

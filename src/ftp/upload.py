@@ -58,7 +58,7 @@ class MyFtp(Thread):
             cret = self._send_file()
             
             #test du code retour 0 = OK
-            if(cret == 0):
+            if(cret != 1):
                 
                 #Changement d'état en base => 3 upload terminé si tout est ok
                 self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 3 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))

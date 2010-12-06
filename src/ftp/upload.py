@@ -112,8 +112,8 @@ class MyFtp(Thread):
             #Login avec user <-> password
             ftp.login( self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"))
 
-            #passe en mode actif
-            ftp.set_pasv(0);
+            #passe en mode passif
+            ftp.set_pasv(1);
             
             try:
                 #creation du repertoire destination

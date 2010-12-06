@@ -2389,3 +2389,8 @@ Sat Dec  4 21:04:46 2010 -- INFO -- Notify new file -- devis-13005-ehrCMQX738.pd
 Sat Dec  4 21:04:46 2010 -- INFO -- Fin du thread -- devis-13005-ehrCMQX738.pdf
 Sat Dec  4 21:04:46 2010 -- INFO -- Notify new file -- devis-2-fELMNVZ372.pdf
 Sat Dec  4 21:04:47 2010 -- INFO -- Fin du thread -- devis-2-fELMNVZ372.pdf
+Mon Dec  6 17:43:34 2010 -- INFO -- Attente du thread -- DOUBLE_AFFICHE_0412_1-2.zip
+Mon Dec  6 17:43:34 2010 -- INFO -- Execution du thread -- DOUBLE_AFFICHE_0412_1-2.zip
+Mon Dec  6 17:43:35 2010 -- INFO -- Creation repertoire -- /cv123454/
+Mon Dec  6 17:43:35 2010 -- WARN -- Repertoire deja existant -- DOUBLE_AFFICHE_0412_1-2.zip
+Mon Dec  6 17:43:35 2010 -- INFO -- Depot du fichier -- DOUBLE_AFFICHE_0412_1-2.zip

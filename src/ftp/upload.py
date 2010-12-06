@@ -133,7 +133,7 @@ class MyFtp(Thread):
                 try:
 
                     #Lancement de l'upload proprement dit#
-                    ftp.storbinary('STOR %s' %self.file[1], f,1024)
+                    ftp.storbinary('STOR %s' %self.file[1], f)
 
                 except all_errors, resp:
 

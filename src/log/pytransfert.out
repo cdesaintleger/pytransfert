@@ -2458,3 +2458,33 @@ Thu Dec  9 10:39:55 2010 -- INFO -- Fermeture du fichier -- DOUBLE_AFFICHE_0412_
 Thu Dec  9 10:39:55 2010 -- INFO -- Deconnection du FTP -- DOUBLE_AFFICHE_0412_1-2.zip
 Thu Dec  9 10:39:55 2010 -- INFO -- Notify new file -- DOUBLE_AFFICHE_0412_1-2.zip
 Thu Dec  9 10:39:55 2010 -- INFO -- Fin du thread -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 12:43:20 2010 -- INFO -- Attente du thread -- Capture_dcran_2010-12-05__13.58.3583.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Execution du thread -- Capture_dcran_2010-12-05__13.58.3583.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Attente du thread -- Capture_dcran_2010-12-05__14.27.0253.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Execution du thread -- Capture_dcran_2010-12-05__14.27.0253.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Attente du thread -- Capture_dcran_2010-12-08__16.41.4935.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Execution du thread -- Capture_dcran_2010-12-08__16.41.4935.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Creation repertoire -- /rf123456/
+Thu Dec  9 12:43:20 2010 -- INFO -- Creation repertoire -- /rf123456/
+Thu Dec  9 12:43:20 2010 -- WARN -- Repertoire deja existant -- Capture_dcran_2010-12-05__14.27.0253.png
+Thu Dec  9 12:43:20 2010 -- WARN -- Repertoire deja existant -- Capture_dcran_2010-12-08__16.41.4935.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Depot du fichier -- Capture_dcran_2010-12-05__14.27.0253.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Depot du fichier -- Capture_dcran_2010-12-08__16.41.4935.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Depot terminé -- Capture_dcran_2010-12-05__14.27.0253.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Fermeture du fichier -- Capture_dcran_2010-12-05__14.27.0253.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Depot terminé -- Capture_dcran_2010-12-08__16.41.4935.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Deconnection du FTP -- Capture_dcran_2010-12-05__14.27.0253.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Fermeture du fichier -- Capture_dcran_2010-12-08__16.41.4935.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Deconnection du FTP -- Capture_dcran_2010-12-08__16.41.4935.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Notify new file -- Capture_dcran_2010-12-05__14.27.0253.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Fin du thread -- Capture_dcran_2010-12-05__14.27.0253.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Notify new file -- Capture_dcran_2010-12-08__16.41.4935.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Fin du thread -- Capture_dcran_2010-12-08__16.41.4935.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Creation repertoire -- /rf123456/
+Thu Dec  9 12:43:20 2010 -- WARN -- Repertoire deja existant -- Capture_dcran_2010-12-05__13.58.3583.png
+Thu Dec  9 12:43:20 2010 -- INFO -- Depot du fichier -- Capture_dcran_2010-12-05__13.58.3583.png
+Thu Dec  9 12:43:21 2010 -- INFO -- Depot terminé -- Capture_dcran_2010-12-05__13.58.3583.png
+Thu Dec  9 12:43:21 2010 -- INFO -- Fermeture du fichier -- Capture_dcran_2010-12-05__13.58.3583.png
+Thu Dec  9 12:43:21 2010 -- INFO -- Deconnection du FTP -- Capture_dcran_2010-12-05__13.58.3583.png
+Thu Dec  9 12:43:21 2010 -- INFO -- Notify new file -- Capture_dcran_2010-12-05__13.58.3583.png
+Thu Dec  9 12:43:21 2010 -- INFO -- Fin du thread -- Capture_dcran_2010-12-05__13.58.3583.png

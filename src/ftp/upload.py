@@ -73,9 +73,12 @@ class MyFtp(Thread):
             
             #test du code retour 0 = OK
             if(cret != 1):
-                
-                #Changement d'état en base => 3 upload terminé si tout est ok
-                self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 3 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
+                try:
+                    #Changement d'état en base => 3 upload terminé si tout est ok
+                    self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 3 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
+
+                except MySQLdb.Error, e: 
+                    self.logger.info( "%s -- ERR -- Error %d: %s" % (strftime('%c',gmtime()), e.args[0], e.args[1]) )
 
                 #notification 
                 self.notify_by_mail('data_newfilenotify')
@@ -151,6 +154,9 @@ class MyFtp(Thread):
 
                     #Lancement de l'upload proprement dit#
                     ftp.storbinary('STOR %s' %self.file[1], f)
+
+                    #info du lancement d'upload du fichier
+                    self.logger.info("%s -- INFO -- Depot terminé -- %s"% (strftime('%c',gmtime()), self.file[1]) )
 
                 except all_errors, resp:
 

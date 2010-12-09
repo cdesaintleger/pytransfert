@@ -2408,3 +2408,53 @@ Mon Dec  6 18:44:11 2010 -- INFO -- Execution du thread -- DOUBLE_AFFICHE_0412_1
 Mon Dec  6 18:44:11 2010 -- INFO -- Creation repertoire -- /cv123454/
 Mon Dec  6 18:44:11 2010 -- WARN -- Repertoire deja existant -- DOUBLE_AFFICHE_0412_1-2.zip
 Mon Dec  6 18:44:11 2010 -- INFO -- Depot du fichier -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:19:30 2010 -- INFO -- Attente du thread -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:19:30 2010 -- INFO -- Execution du thread -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:19:31 2010 -- INFO -- Creation repertoire -- /cv123454/
+Thu Dec  9 10:19:31 2010 -- INFO -- Depot du fichier -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:22:14 2010 -- INFO -- Fermeture du fichier -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:22:14 2010 -- INFO -- Deconnection du FTP -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:22:14 2010 -- INFO -- Notify new file -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:22:14 2010 -- INFO -- Fin du thread -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:37:06 2010 -- INFO -- Attente du thread -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:37:06 2010 -- INFO -- Execution du thread -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:37:06 2010 -- INFO -- Attente du thread -- Capture_dcran_2010-12-05__13.58.35.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Execution du thread -- Capture_dcran_2010-12-05__13.58.35.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Attente du thread -- Capture_dcran_2010-12-05__14.27.02.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Execution du thread -- Capture_dcran_2010-12-05__14.27.02.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Attente du thread -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Execution du thread -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:06 2010 -- ERR -- 421 There are too many connections from your internet address. etat devient 500 -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Notify error -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Creation repertoire -- /rf123456/
+Thu Dec  9 10:37:06 2010 -- INFO -- Creation repertoire -- /cv123454/
+Thu Dec  9 10:37:06 2010 -- INFO -- Creation repertoire -- /rf123456/
+Thu Dec  9 10:37:06 2010 -- INFO -- Fermeture du fichier -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Deconnection du FTP -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:06 2010 -- WARN -- Repertoire deja existant -- Capture_dcran_2010-12-05__14.27.02.png
+Thu Dec  9 10:37:06 2010 -- WARN -- Repertoire deja existant -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:37:06 2010 -- INFO -- Fin du thread -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Depot du fichier -- Capture_dcran_2010-12-05__14.27.02.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Depot du fichier -- Capture_dcran_2010-12-05__13.58.35.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Depot du fichier -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:37:06 2010 -- INFO -- Fermeture du fichier -- Capture_dcran_2010-12-05__14.27.02.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Deconnection du FTP -- Capture_dcran_2010-12-05__14.27.02.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Notify new file -- Capture_dcran_2010-12-05__14.27.02.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Fin du thread -- Capture_dcran_2010-12-05__14.27.02.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Fermeture du fichier -- Capture_dcran_2010-12-05__13.58.35.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Deconnection du FTP -- Capture_dcran_2010-12-05__13.58.35.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Notify new file -- Capture_dcran_2010-12-05__13.58.35.png
+Thu Dec  9 10:37:06 2010 -- INFO -- Fin du thread -- Capture_dcran_2010-12-05__13.58.35.png
+Thu Dec  9 10:37:51 2010 -- INFO -- Attente du thread -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:51 2010 -- INFO -- Execution du thread -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:51 2010 -- INFO -- Creation repertoire -- /rf123456/
+Thu Dec  9 10:37:51 2010 -- WARN -- Repertoire deja existant -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:51 2010 -- INFO -- Depot du fichier -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:51 2010 -- INFO -- Fermeture du fichier -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:51 2010 -- INFO -- Deconnection du FTP -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:52 2010 -- INFO -- Notify new file -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:37:52 2010 -- INFO -- Fin du thread -- Capture_dcran_2010-12-08__16.41.49.png
+Thu Dec  9 10:39:55 2010 -- INFO -- Fermeture du fichier -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:39:55 2010 -- INFO -- Deconnection du FTP -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:39:55 2010 -- INFO -- Notify new file -- DOUBLE_AFFICHE_0412_1-2.zip
+Thu Dec  9 10:39:55 2010 -- INFO -- Fin du thread -- DOUBLE_AFFICHE_0412_1-2.zip

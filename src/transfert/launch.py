@@ -20,13 +20,13 @@ class Transfert(Thread):
         self.ThUp    =   {}
 
         
-    def upload_ftp(self,list,logger,sql,conf):
+    def upload_ftp(self,list,logger,conf):
 
         
         #parcour des fichiers
         for file in list:
             
             #upload du fichier par un thread
-            upload.MyFtp(self.sem,file,logger,sql,conf).start()
+            upload.MyFtp(self.sem,file,logger,conf).start()
 
            

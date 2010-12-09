@@ -25,10 +25,23 @@ import logging.handlers
 ##                                         ##
 #############################################
 
-def maintimer(tempo, trans, conf, logger, sql):
+def maintimer(tempo, trans, conf, logger):
+
+    #instanciation à la base
+    sql  =   acces_bd.Sql()
+
+    #Paramétres de connection
+    sql.set_db(conf.get("DDB", "DATABASE"))
+    sql.set_host(conf.get("DDB", "HOST"))
+    sql.set_user(conf.get("DDB", "USER"))
+    sql.set_password(conf.get("DDB", "PASSWORD"))
+    #connection effective
+    sql.conn()
+
+
 
     #Timer par defaut */5 minutes
-    threading.Timer(tempo, maintimer, [tempo,trans,conf,logger,sql]).start()
+    threading.Timer(tempo, maintimer, [tempo,trans,conf,logger]).start()
 
     #Recupére les images à transferer ( nouvelles + écouées )
     res =   sql.execute("\
@@ -58,15 +71,26 @@ def maintimer(tempo, trans, conf, logger, sql):
 
 
         #Envoie la file à gerer
-        trans.upload_ftp(res,logger,sql,conf)
+        trans.upload_ftp(res,logger,conf)
 
 
 
 #Méthode de nettoyage des fichiers uploadés
-def cleaner_timer(tempo,conf,sql):
+def cleaner_timer(tempo,conf):
+
+    #instanciation à la base
+    sql  =   acces_bd.Sql()
+
+    #Paramétres de connection
+    sql.set_db(conf.get("DDB", "DATABASE"))
+    sql.set_host(conf.get("DDB", "HOST"))
+    sql.set_user(conf.get("DDB", "USER"))
+    sql.set_password(conf.get("DDB", "PASSWORD"))
+    #connection effective
+    sql.conn()
 
     #Timer par defaut */5 minutes
-    threading.Timer(tempo, cleaner_timer, [tempo,conf,sql]).start()
+    threading.Timer(tempo, cleaner_timer, [tempo,conf]).start()
 
     #Recupére les images à transferer ( nouvelles + écouées )
     res =   sql.execute("\
@@ -132,28 +156,13 @@ if __name__ == "__main__":
 
 
 
-
-    #instanciation à la base
-    sql  =   acces_bd.Sql()
-
-    #Paramétres de connection
-    sql.set_db(conf.get("DDB", "DATABASE"))
-    sql.set_host(conf.get("DDB", "HOST"))
-    sql.set_user(conf.get("DDB", "USER"))
-    sql.set_password(conf.get("DDB", "PASSWORD"))
-    #connection effective
-    sql.conn()
-
-
-
-
     #Instanciation du transfert par thread
     trans   =   launch.Transfert()
 
     #Lancement main go go go 
-    maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf, logger, sql)
+    maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf, logger)
     
     #Gestion du nettoyae automatique
-    cleaner_timer( conf.getint("GLOBAL","CLEANER_TIMER"),conf,sql )
+    cleaner_timer( conf.getint("GLOBAL","CLEANER_TIMER"),conf)
 
 

@@ -9,6 +9,9 @@ from ftplib import FTP, error_perm, all_errors
 #logging
 from time import strftime, gmtime
 
+#ftp
+from bdd import acces_bd
+
 
 #mails
 import smtplib
@@ -18,7 +21,7 @@ from email.mime.text import MIMEText
 
 class MyFtp(Thread):
 
-    def __init__(self,sem,file,logger,sql,conf):
+    def __init__(self,sem,file,logger,conf):
 
         #initialisation du thread
         Thread.__init__(self)
@@ -33,7 +36,18 @@ class MyFtp(Thread):
         self.file   =   file
 
         #Connexion SQL pour la changement des etats
-        self.sql = sql
+
+        #instanciation à la base
+        self.sql  =   acces_bd.Sql()
+
+        #Paramétres de connection
+        self.sql.set_db(conf.get("DDB", "DATABASE"))
+        self.sql.set_host(conf.get("DDB", "HOST"))
+        self.sql.set_user(conf.get("DDB", "USER"))
+        self.sql.set_password(conf.get("DDB", "PASSWORD"))
+        #connection effective
+        self.sql.conn()
+        
 
         #mise en place du logger
         self.logger=logger

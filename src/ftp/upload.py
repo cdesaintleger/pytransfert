@@ -4,7 +4,9 @@
 from threading import Thread
 
 #ftp
-from ftplib import FTP, error_perm, all_errors
+#from ftplib import FTP, error_perm, all_errors
+import ftputil
+
 
 #logging
 from time import strftime, gmtime
@@ -100,44 +102,24 @@ class MyFtp(Thread):
             self.sem.release()
 
 
+    def keepalive(self,ftp):
+        ftp.keep_alive()
 
     #Méthode _send_file gére les transactions avec le serveur FTP 
     def _send_file(self):
 
-        try:
-            #ouverture du fichier data
-            f = open(self.file[3]+self.file[1],'rb')
-            
-        except IOError:
-            #erreur à l'ouverture du fichier
-            self.logger.info('%s -- ERR -- sendFile error opening [%s] -- etat devient 404' % (strftime('%c',gmtime()), self.file[1]) )
-
-            #Changement d'état en base => 404 Fichier introuvable
-            self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 404 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
-
-            #notification erreur
-            self.notify_by_mail('data_emergencynotify')
-            self.logger.info("%s -- INFO -- Notify error -- %s"% (strftime('%c',gmtime()), self.file[1]) )
-
-            #quit la fonction
-            return 1
-
 
         try:
-            #connection au serveur FTP
-            ftp =   FTP( self.conf.get("FTP", "HOST") )
-            #Login avec user <-> password
-            ftp.login( self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"))
 
-            #passe en mode passif
-            ftp.set_pasv(1);
+            self.logger.info("%s -- INFO -- Connexion -- %s"% (strftime('%c',gmtime()), self.file[4]) )
+            ftp =   ftputil.FTPHost( self.conf.get("FTP", "HOST"), self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"))
             
             try:
                 #creation du repertoire destination
                 self.logger.info("%s -- INFO -- Creation repertoire -- %s"% (strftime('%c',gmtime()), self.file[4]) )
-                ftp.mkd(self.file[4])
+                ftp.mkdir(str(self.file[4]).strip('/'))
 
-            except error_perm, resp:
+            except OSError, resp:
 
                 #si le repertoire existe déjà .. on signale et on passe
                 self.logger.info("%s -- WARN -- Repertoire deja existant -- %s"% (strftime('%c',gmtime()), self.file[1]) )
@@ -145,7 +127,7 @@ class MyFtp(Thread):
             finally:
 
                 #on se déplace dans le repertoire finale
-                ftp.cwd(self.file[4])
+                ftp.chdir(self.file[4])
 
                 #info du lancement d'upload du fichier
                 self.logger.info("%s -- INFO -- Depot du fichier -- %s"% (strftime('%c',gmtime()), self.file[1]) )
@@ -153,12 +135,12 @@ class MyFtp(Thread):
                 try:
 
                     #Lancement de l'upload proprement dit#
-                    ftp.storbinary('STOR %s' %self.file[1], f)
+                    ftp.upload(self.file[3]+self.file[1], self.file[1], 'b', self.keepalive(ftp))
 
                     #info du lancement d'upload du fichier
                     self.logger.info("%s -- INFO -- Depot terminé -- %s"% (strftime('%c',gmtime()), self.file[1]) )
 
-                except all_errors, resp:
+                except FTPIOError, resp:
 
                     #remet l'etat du fichier à 0 pour reesayer
                     self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 0 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
@@ -170,40 +152,23 @@ class MyFtp(Thread):
             #code retour
             return 0
         
-        except error_perm, resp:
+        except:
 
             #Changement d'état en base => 500 Probleme de connection ou d'ecriture
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 500 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
-            self.logger.info("%s -- ERR -- %s etat devient 500 -- %s"% (strftime('%c',gmtime()), resp, self.file[1]) )
+            self.logger.info("%s -- ERR -- etat devient 500 -- %s"% (strftime('%c',gmtime()), self.file[1]) )
 
             #notification erreur
             self.logger.info("%s -- INFO -- Notify error -- %s"% (strftime('%c',gmtime()), self.file[1]) )
             self.notify_by_mail('data_emergencynotify')
 
-            return 1
-
-        except all_errors, resp:
-
-            #Changement d'état en base => 500 Probleme de connection ou d'ecriture
-            self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 500 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
-
-            self.logger.info("%s -- ERR -- %s etat devient 500 -- %s"% (strftime('%c',gmtime()), resp, self.file[1]) )
-
-            #notification erreur
-            self.logger.info("%s -- INFO -- Notify error -- %s"% (strftime('%c',gmtime()), self.file[1]) )
-            self.notify_by_mail('data_emergencynotify')
-            
             return 1
         
         finally:
 
-            #fermeture du fichier
-            self.logger.info("%s -- INFO -- Fermeture du fichier -- %s"% (strftime('%c',gmtime()), self.file[1]) )
-            f.close()
-            #cloture de la connection FTP
             self.logger.info("%s -- INFO -- Deconnection du FTP -- %s"% (strftime('%c',gmtime()), self.file[1]) )
-            ftp.quit()
+            ftp.close()
 
 
     #Notification par mail de l'arrivé des fichiers ou d'un probléme quelconque

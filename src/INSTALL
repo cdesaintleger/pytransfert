@@ -1,0 +1,88 @@
+
+// I -----   Dépendances   -------
+
+    apt-get install python-setuptools python-mysqldb
+    easy_install ftputil
+
+
+
+// II -----   Table mysql   -------
+
+    --
+    -- Structure de la table `pytransfert`
+    --
+
+    CREATE TABLE IF NOT EXISTS `pytransfert` (
+      `id` int(11) NOT NULL auto_increment,
+      `img` text NOT NULL,
+      `cmd` varchar(8) NOT NULL,
+      `source` text NOT NULL COMMENT 'chemin absolu du fichier √† transf√©rer',
+      `destination` text NOT NULL COMMENT 'destination du fichier sur le ftp',
+      `date` datetime NOT NULL COMMENT 'date d''arriv√©e des fichiers',
+      `etat` int(11) NOT NULL default '0',
+      PRIMARY KEY  (`id`),
+      KEY `etat` (`etat`)
+    ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1425 ;
+
+
+
+
+// III -----   Marche à suivre    -----
+
+    cd /opt
+    git clone git://github.com/cdesaintleger/pytransfert.git
+    cd pytransfert/src
+    chmod -R 777 log/
+    cp params.ini.sample params.ini
+    vim params.ini
+
+
+
+/////*configurer selon votre infrastructure , utiliser le nom exacte des champs de la table utilisées :
+/////*Si vous modifiez le nmo des champs , n'oubliez pas de les reporter dans params.ini
+
+
+    chmod 711 /pytransfert/src/pytransfert.py
+    cp script-init.sh /etc/init.d/pytransfert.sh
+    chmod 711 /etc/init.d/pytransfert.sh
+    cd /etc/init.d
+    vim pytransfert.sh
+
+/////*Vérifier le chemin et la version de python
+/////* le chemin DOIT être le suivant : /usr/bin/python
+                 ----
+                 ----
+
+
+    update-rc.d pytransfert.sh defaults
+
+
+// IV   ----- Tests -----
+
+    ./pytransfert.sh start
+    tail -f /opt/pytransfert/src/log/pytransfert.out
+
+/////* Ajouter un enregistrement dans votre table ... regarder les logs si tout est ok .
+
+
+Bonne journée ,
+
+
+                                       ,--,
+                                    ,---.'|
+  ,----..      ,---,      .--.--.   |   | :
+ /   /   \   .'  .' `\   /  /    '. :   : |
+|   :     :,---.'     \ |  :  /`. / |   ' :
+.   |  ;. /|   |  .`\  |;  |  |--`  ;   ; '
+.   ; /--` :   : |  '  ||  :  ;_    '   | |__
+;   | ;    |   ' '  ;  : \  \    `. |   | :.'|
+|   : |    '   | ;  .  |  `----.   \'   :    ;
+.   | '___ |   | :  |  '  __ \  \  ||   |  ./
+'   ; : .'|'   : | /  ;  /  /`--'  /;   : ;
+'   | '/  :|   | '` ,/  '--'.     / |   ,/
+|   :    / ;   :  .'      `--'---'  '---'
+ \   \ .'  |   ,.'
+  `---`    '---'
+
+
+

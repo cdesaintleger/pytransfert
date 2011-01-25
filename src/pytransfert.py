@@ -163,6 +163,6 @@ if __name__ == "__main__":
     maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf, logger)
     
     #Gestion du nettoyae automatique
-    cleaner_timer( conf.getint("GLOBAL","CLEANER_TIMER"),conf)
+    cleaner_timer(conf.getint("GLOBAL","CLEANER_TIMER"),conf)
 
 

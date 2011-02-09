@@ -14,7 +14,7 @@ start() {
 stop() {
       echo -n "Stopping $DESC "
       start-stop-daemon --stop --quiet --pidfile /var/run/pytransfert.pid \
-      --chdir $CHEMIN --exec /usr/local/bin/python2.7
+      --chdir $CHEMIN --exec /usr/local/bin/python
       echo "$NAME."
 }
 
@@ -30,7 +30,7 @@ case "$1" in
       start
   ;;
     *)
-      echo "Usage: php-fpm {start|stop|restart}"
+      echo "Usage: pytransfert {start|stop|restart}"
       exit 1
   ;;
 esac

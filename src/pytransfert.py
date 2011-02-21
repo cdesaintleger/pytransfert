@@ -12,13 +12,14 @@ from bdd import acces_bd
 from transfert import launch
 import threading
 import ConfigParser
-import os
+import os,sys
 import warnings
 
 #logging
 import logging
 import logging.handlers
 
+  
 #############################################
 ##                                         ##
 ##                  MAIN                   ##
@@ -135,34 +136,43 @@ def cleaner_timer(tempo,conf):
 #############################################
 if __name__ == "__main__":
 
-    #lecture du fichier de config
-    conf    =   ConfigParser.ConfigParser()
-    conf.read("params.ini")
+    #Détache le process fils
+    pid = os.fork()
+    if pid:
+        print ">>> Le Pére: Fils ou es tu ? ... je te quitte nous nous retrouverons au prochain reboot ..."
+        sys.exit(0)
+
+    else:
+        print ">>> Le Fils ( pid: "+str(pid)+" ): Pére je suis là ... je vais méner la mission à bien ne t'en fait pas ... mon créaeur est un génie .. ' oulà .. les chevilles :p  '"
+
+        #lecture du fichier de config
+        conf    =   ConfigParser.ConfigParser()
+        conf.read("params.ini")
 
 
 
-    #mise en place du logger
-    LOG_FILENAME = 'log/pytransfert.out'
+        #mise en place du logger
+        LOG_FILENAME = 'log/pytransfert.out'
 
-    # Set up a specific logger with our desired output level
-    logger = logging.getLogger('pyTransfert')
-    logger.setLevel(logging.DEBUG)
+        # Set up a specific logger with our desired output level
+        logger = logging.getLogger('pyTransfert')
+        logger.setLevel(logging.DEBUG)
 
-    # Add the log message handler to the logger
-    handler = logging.handlers.RotatingFileHandler(
-                  LOG_FILENAME, maxBytes=16777216, backupCount=5)
+        # Add the log message handler to the logger
+        handler = logging.handlers.RotatingFileHandler(
+                      LOG_FILENAME, maxBytes=16777216, backupCount=5)
 
-    logger.addHandler(handler)
+        logger.addHandler(handler)
 
 
 
-    #Instanciation du transfert par thread
-    trans   =   launch.Transfert()
+        #Instanciation du transfert par thread
+        trans   =   launch.Transfert()
 
-    #Lancement main go go go 
-    maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf, logger)
-    
-    #Gestion du nettoyae automatique
-    cleaner_timer(conf.getint("GLOBAL","CLEANER_TIMER"),conf)
+        #Lancement main go go go
+        maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf, logger)
+
+        #Gestion du nettoyae automatique
+        cleaner_timer(conf.getint("GLOBAL","CLEANER_TIMER"),conf)
 
 

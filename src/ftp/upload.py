@@ -5,7 +5,7 @@ from threading import Thread
 
 #ftp
 #from ftplib import FTP, error_perm, all_errors
-import ftputil
+from libftputil import ftputil
 
 
 #logging

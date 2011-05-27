@@ -4,8 +4,9 @@ TIMER   =   nombre de secondes entre chaque verif de nouveaux fichiers à upload
 NBTHREAD=   nombre de upload simultané
 CLEANER_TIMER   =   temps entre caque rotation du process de nettoyage
 JOURS_RETENTION =   nombre de jours de retention des fichiers sur le serveur
-NB_CYCLE_ROTATION_CLEANER   =   2
-NB_CYCLE_ROTATION_FTP       =   200
+ENABLE_ROTATION = 0 ou 1 active ou désactive la rotation des process ( regeneration de process )
+NB_CYCLE_ROTATION_CLEANER   =   nombre de cycles avant de faire une rotation de process Cleaner
+NB_CYCLE_ROTATION_FTP       =   nombre de cycles avant de faire une rotation de process FTP
 
 [LOG]
 LEVEL   =   niveau de log .. pas encore en fonction

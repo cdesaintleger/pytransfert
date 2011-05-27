@@ -34,14 +34,14 @@ def maintimer(tempo, trans, conf, logger):
     global gl_rotation_ftp
     gl_rotation_ftp =   gl_rotation_ftp+1
 
-    if (gl_rotation_ftp)%conf.getint("GLOBAL","NB_CYCLE_ROTATION_FTP") == 0:
+    if ((gl_rotation_ftp)%conf.getint("GLOBAL","NB_CYCLE_ROTATION_FTP") == 0) & (conf.getint("GLOBAL","ENABLE_ROTATION") == 1):
 
         #Fin du fils on le fork
         pid = os.fork()
         if pid:
             #Log de la rotation
             logger.info("%s -- INFO -- Rotation du process Ftp -- "% (strftime('%c',gmtime())) )
-            sys.exit(0)
+            sys.exit(os.EX_OK)
 
         else:
             logger.info("%s -- INFO -- Je suis le nouveau process Ftp -- "% (strftime('%c',gmtime())) )
@@ -104,13 +104,13 @@ def cleaner_timer(tempo,conf):
     global gl_rotation_clean
     gl_rotation_clean   =   gl_rotation_clean+1
 
-    if (gl_rotation_clean)%conf.getint("GLOBAL","NB_CYCLE_ROTATION_CLEANER") == 0:
+    if ((gl_rotation_clean)%conf.getint("GLOBAL","NB_CYCLE_ROTATION_CLEANER") == 0) & (conf.getint("GLOBAL","ENABLE_ROTATION") == 1):
 
         #Fin du fils on le fork
         pid = os.fork()
         if pid:
             logger.info("%s -- INFO -- Rotation du process Cleaner -- "% (strftime('%c',gmtime())) )
-            sys.exit(0)
+            sys.exit(os.EX_OK)
 
         else:
             logger.info("%s -- INFO -- je suis le nouveau process Cleaner -- "% (strftime('%c',gmtime())) )
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     pid = os.fork()
     if pid:
         print ">>> Le Pére: Fils ou es tu ? ... je te quitte nous nous retrouverons au prochain reboot ..."
-        sys.exit(0)
+        sys.exit(os.EX_OK)
 
     else:
         print ">>> Le Fils ( pid: "+str(pid)+" ): Pére je suis là ... je vais méner la mission à bien ne t'en fait pas ... mon créaeur est un génie .. ' oulà .. les chevilles :p  '"

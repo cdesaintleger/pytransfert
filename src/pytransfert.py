@@ -86,6 +86,9 @@ def maintimer(tempo, trans, conf, logger):
         #compte le nombre de resultats trouvés
         nbFiles =   len(res)
 
+        #log du nombre de fichiers à traiter
+        logger.info("%s -- INFO -- Fichiers à traiter : %s -- "% (strftime('%c',gmtime())), str(nbFiles) )
+
         #lancement uniquement sil y a des fichiers à uploader
         if( nbFiles > 0 ):
 
@@ -145,7 +148,8 @@ def cleaner_timer(tempo,conf):
         if( len(res) > 0 ):
             for file in res:
 
-                print ("Nettoyage de : "+str(file[2])+"/"+str(file[1])+"\n")
+                #print ("Nettoyage de : "+str(file[2])+"/"+str(file[1])+"\n")
+                logger.info("%s -- INFO -- Nettoyage de : %s / %s -- "% (strftime('%c',gmtime())),str(file[2]),str(file[1]) )
 
                 try:
 

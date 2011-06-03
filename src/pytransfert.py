@@ -16,7 +16,7 @@ import os,sys
 import warnings
 
 #logging
-from time import strftime, gmtime
+from time import strftime, localtime
 
 #logging
 import logging
@@ -40,11 +40,11 @@ def maintimer(tempo, trans, conf, logger):
         pid = os.fork()
         if pid:
             #Log de la rotation
-            logger.info("%s -- INFO -- Rotation du process Ftp -- "% (strftime('%c',gmtime())) )
+            logger.info("%s -- INFO -- Rotation du process Ftp -- "% (strftime('%c',localtime())) )
             sys.exit(os.EX_OK)
 
         else:
-            logger.info("%s -- INFO -- Je suis le nouveau process Ftp -- "% (strftime('%c',gmtime())) )
+            logger.info("%s -- INFO -- Je suis le nouveau process Ftp -- "% (strftime('%c',localtime())) )
             gl_rotation_ftp = 0
             maintimer(tempo, trans, conf, logger)
 
@@ -87,7 +87,7 @@ def maintimer(tempo, trans, conf, logger):
         nbFiles =   len(res)
 
         #log du nombre de fichiers à traiter
-        logger.info("%s -- INFO -- Fichiers à traiter : %s -- "% (strftime('%c',gmtime()),str(nbFiles) ) )
+        logger.info("%s -- INFO -- Fichiers à traiter : %s -- "% (strftime('%c',localtime()),str(nbFiles) ) )
 
         #lancement uniquement sil y a des fichiers à uploader
         if( nbFiles > 0 ):
@@ -112,11 +112,11 @@ def cleaner_timer(tempo,conf):
         #Fin du fils on le fork
         pid = os.fork()
         if pid:
-            logger.info("%s -- INFO -- Rotation du process Cleaner -- "% (strftime('%c',gmtime())) )
+            logger.info("%s -- INFO -- Rotation du process Cleaner -- "% (strftime('%c',localtime())) )
             sys.exit(os.EX_OK)
 
         else:
-            logger.info("%s -- INFO -- je suis le nouveau process Cleaner -- "% (strftime('%c',gmtime())) )
+            logger.info("%s -- INFO -- je suis le nouveau process Cleaner -- "% (strftime('%c',localtime())) )
             gl_rotation_clean = 0
             cleaner_timer(tempo,conf)
 
@@ -149,7 +149,7 @@ def cleaner_timer(tempo,conf):
             for file in res:
 
                 #print ("Nettoyage de : "+str(file[2])+"/"+str(file[1])+"\n")
-                logger.info("%s -- INFO -- Nettoyage de : %s / %s -- "% (strftime('%c',gmtime()),str(file[2]),str(file[1])) )
+                logger.info("%s -- INFO -- Nettoyage de : %s / %s -- "% (strftime('%c',localtime()),str(file[2]),str(file[1])) )
 
                 try:
 
@@ -190,6 +190,13 @@ if __name__ == "__main__":
 
     else:
         print ">>> Le Fils ( pid: "+str(pid)+" ): Pére je suis là ... je vais méner la mission à bien ne t'en fait pas ... mon créaeur est un génie .. ' oulà .. les chevilles :p  '"
+
+        print ">>> Répertoire de travail : "+os.getcwd()
+
+        # Decouple from parent environment
+        os.chdir(os.getcwd())
+        os.setsid()
+        os.umask(022)
 
         #lecture du fichier de config
         conf    =   ConfigParser.ConfigParser()

@@ -58,7 +58,7 @@ class MyFtp(Thread):
     def run(self):
 
         #Signale que l'on met en file le fichier
-        self.logger.info("%s -- INFO -- Attente du thread -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+        self.logger.info("%s -- INFO -- Attente du thread -- %s"% (strftime('%c',localtime()), self.file[1]) )
         
         #aquisition d'un jeton ( semaphore ) ou attente d'une libération
         self.sem.acquire()
@@ -68,7 +68,7 @@ class MyFtp(Thread):
 
         try:
             #jeton acquis , signalement du lancement de l'upload du fichier
-            self.logger.info("%s -- INFO -- Execution du thread -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+            self.logger.info("%s -- INFO -- Execution du thread -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
             #envoie du fichier au module FTP
             cret = self._send_file()
@@ -80,11 +80,11 @@ class MyFtp(Thread):
                     self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 3 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
                 except MySQLdb.Error, e: 
-                    self.logger.info( "%s -- ERR -- Error %d: %s" % (strftime('%c',gmtime()), e.args[0], e.args[1]) )
+                    self.logger.info( "%s -- ERR -- Error %d: %s" % (strftime('%c',localtime()), e.args[0], e.args[1]) )
 
                 #notification 
                 self.notify_by_mail('data_newfilenotify')
-                self.logger.info("%s -- INFO -- Notify new file -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+                self.logger.info("%s -- INFO -- Notify new file -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
             else:
                 #remet l'etat du fichier à 0 pour reesayer
@@ -92,11 +92,11 @@ class MyFtp(Thread):
 
                 #notification 
                 self.notify_by_mail('data_retryfilenotify')
-                self.logger.info("%s -- ERR -- Notify retry file -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+                self.logger.info("%s -- ERR -- Notify retry file -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
         finally:
             #signalement de la fin de l'upload donc du thread
-            self.logger.info("%s -- INFO -- Fin du thread -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+            self.logger.info("%s -- INFO -- Fin du thread -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
             #libération du jeton pour laisser la place à un autre
             self.sem.release()
@@ -111,18 +111,18 @@ class MyFtp(Thread):
 
         try:
 
-            self.logger.info("%s -- INFO -- Connexion -- %s"% (strftime('%c',gmtime()), self.file[4]) )
+            self.logger.info("%s -- INFO -- Connexion -- %s"% (strftime('%c',localtime()), self.file[4]) )
             ftp =   ftputil.FTPHost( self.conf.get("FTP", "HOST"), self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"))
             
             try:
                 #creation du repertoire destination
-                self.logger.info("%s -- INFO -- Creation repertoire -- %s"% (strftime('%c',gmtime()), self.file[4]) )
+                self.logger.info("%s -- INFO -- Creation repertoire -- %s"% (strftime('%c',localtime()), self.file[4]) )
                 ftp.mkdir(str(self.file[4]).strip('/'))
 
             except OSError, resp:
 
                 #si le repertoire existe déjà .. on signale et on passe
-                self.logger.info("%s -- WARN -- Repertoire deja existant -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+                self.logger.info("%s -- WARN -- Repertoire deja existant -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
             finally:
 
@@ -130,7 +130,7 @@ class MyFtp(Thread):
                 ftp.chdir(self.file[4])
 
                 #info du lancement d'upload du fichier
-                self.logger.info("%s -- INFO -- Depot du fichier -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+                self.logger.info("%s -- INFO -- Depot du fichier -- %s"% (strftime('%c',localtime()), self.file[1]) )
                 
                 try:
 
@@ -138,14 +138,14 @@ class MyFtp(Thread):
                     ftp.upload(self.file[3]+self.file[1], self.file[1], 'b', self.keepalive(ftp))
 
                     #info du lancement d'upload du fichier
-                    self.logger.info("%s -- INFO -- Depot terminé -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+                    self.logger.info("%s -- INFO -- Depot terminé -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
                 except FTPIOError, resp:
 
                     #remet l'etat du fichier à 0 pour reesayer
                     self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 0 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
-                    self.logger.info("%s -- ERR -- %s etat devient 0 Erreur transfert du fichier -- %s"% (strftime('%c',gmtime()), resp, self.file[1]) )
+                    self.logger.info("%s -- ERR -- %s etat devient 0 Erreur transfert du fichier -- %s"% (strftime('%c',localtime()), resp, self.file[1]) )
                     #Retour erreur
                     return 1
 
@@ -157,17 +157,17 @@ class MyFtp(Thread):
             #Changement d'état en base => 500 Probleme de connection ou d'ecriture
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 500 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
 
-            self.logger.info("%s -- ERR -- etat devient 500 -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+            self.logger.info("%s -- ERR -- etat devient 500 -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
             #notification erreur
-            self.logger.info("%s -- INFO -- Notify error -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+            self.logger.info("%s -- INFO -- Notify error -- %s"% (strftime('%c',localtime()), self.file[1]) )
             self.notify_by_mail('data_emergencynotify')
 
             return 1
         
         finally:
 
-            self.logger.info("%s -- INFO -- Deconnection du FTP -- %s"% (strftime('%c',gmtime()), self.file[1]) )
+            self.logger.info("%s -- INFO -- Deconnection du FTP -- %s"% (strftime('%c',localtime()), self.file[1]) )
             ftp.close()
 
 

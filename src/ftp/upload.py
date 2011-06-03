@@ -9,7 +9,7 @@ from libftputil import ftputil
 
 
 #logging
-from time import strftime, gmtime
+from time import strftime, localtime
 
 #ftp
 from bdd import acces_bd

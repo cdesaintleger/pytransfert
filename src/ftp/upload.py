@@ -40,7 +40,7 @@ class MyFtp(Thread):
         #Connexion SQL pour la changement des etats
 
         #instanciation à la base
-        self.sql  =   acces_bd.Sql()
+        self.sql  =   acces_bd.Sql(logger)
 
         #Paramétres de connection
         self.sql.set_db(conf.get("DDB", "DATABASE"))
@@ -48,7 +48,7 @@ class MyFtp(Thread):
         self.sql.set_user(conf.get("DDB", "USER"))
         self.sql.set_password(conf.get("DDB", "PASSWORD"))
         #connection effective
-        self.sql.conn(logger)
+        self.sql.conn()
         
 
         #mise en place du logger

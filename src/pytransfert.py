@@ -5,7 +5,7 @@
 # and open the template in the editor.
 
 __author__="christophe de saint leger"
-__date__ ="$29 mars 2011 10:46:48$"
+__date__ ="$05 Juin 2011 17:51:23$"
 
 #importation des lib necessaires
 from bdd import acces_bd
@@ -16,7 +16,7 @@ import os,sys
 import warnings
 
 #logging
-from time import strftime, localtime
+from time import strftime, localtime, sleep
 
 #logging
 import logging
@@ -29,141 +29,138 @@ import logging.handlers
 ##                                         ##
 #############################################
 
-def maintimer(tempo, trans, conf, logger):
+class MainPytransfert(threading.Thread):
 
-    global gl_rotation_ftp
-    gl_rotation_ftp =   gl_rotation_ftp+1
+    def __init__(self,tempo, trans, conf, logger):
+        self.tempo  =   tempo
+        self.trans  =   trans
+        self.conf   =   conf
+        self.logger =   logger
+        threading.Thread.__init__(self);
 
-    if ((gl_rotation_ftp)%conf.getint("GLOBAL","NB_CYCLE_ROTATION_FTP") == 0) & (conf.getint("GLOBAL","ENABLE_ROTATION") == 1):
+    def run(self):
+        self.maintimer(self.tempo, self.trans, self.conf, self.logger)
 
-        #Fin du fils on le fork
-        pid = os.fork()
-        if pid:
-            #Log de la rotation
-            logger.info("%s -- INFO -- Rotation du process Ftp -- "% (strftime('%c',localtime())) )
-            sys.exit(os.EX_OK)
+    def maintimer(self, tempo, trans, conf, logger):
 
-        else:
-            logger.info("%s -- INFO -- Je suis le nouveau process Ftp -- "% (strftime('%c',localtime())) )
-            gl_rotation_ftp = 0
-            maintimer(tempo, trans, conf, logger)
+        while True:
 
-    else:
-        
-        #instanciation à la base
-        sql  =   acces_bd.Sql()
+            #instanciation à la base
+            sql  =   acces_bd.Sql(logger)
 
-        #Paramétres de connection
-        sql.set_db(conf.get("DDB", "DATABASE"))
-        sql.set_host(conf.get("DDB", "HOST"))
-        sql.set_user(conf.get("DDB", "USER"))
-        sql.set_password(conf.get("DDB", "PASSWORD"))
-        #connection effective
-        sql.conn()
+            #Paramétres de connection
+            sql.set_db(conf.get("DDB", "DATABASE"))
+            sql.set_host(conf.get("DDB", "HOST"))
+            sql.set_user(conf.get("DDB", "USER"))
+            sql.set_password(conf.get("DDB", "PASSWORD"))
+            #connection effective
+            sql.conn()
 
-
-
-        #Timer par defaut */5 minutes
-        threading.Timer(tempo, maintimer, [tempo,trans,conf,logger]).start()
-
-        #Recupére les images à transferer ( nouvelles + écouées )
-        res =   sql.execute("\
-            SELECT "+str(conf.get("DDB","CHAMP_ID"))+",\
-            "+str(conf.get("DDB","CHAMP_IMG"))+",\
-            "+str(conf.get("DDB","CHAMP_CMD"))+",\
-            "+str(conf.get("DDB","CHAMP_SOURCE"))+",\
-            "+str(conf.get("DDB","CHAMP_DEST"))+"\
-            FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
-            WHERE "+str(conf.get("DDB","CHAMP_ETAT"))+" in (0,500)")
+            #Recupére les images à transferer ( nouvelles + écouées )
+            res =   sql.execute("\
+                SELECT "+str(conf.get("DDB","CHAMP_ID"))+",\
+                "+str(conf.get("DDB","CHAMP_IMG"))+",\
+                "+str(conf.get("DDB","CHAMP_CMD"))+",\
+                "+str(conf.get("DDB","CHAMP_SOURCE"))+",\
+                "+str(conf.get("DDB","CHAMP_DEST"))+"\
+                FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
+                WHERE "+str(conf.get("DDB","CHAMP_ETAT"))+" in (0,500)")
 
 
-        #parcour des fichiers
-        listeid =  list()
+            #parcour des fichiers
+            listeid =  list()
 
-        for file in res:
-            listeid.append(str(file[0]))
-
-        #compte le nombre de resultats trouvés
-        nbFiles =   len(res)
-
-        #log du nombre de fichiers à traiter
-        logger.info("%s -- INFO -- Fichiers à traiter : %s -- "% (strftime('%c',localtime()),str(nbFiles) ) )
-
-        #lancement uniquement sil y a des fichiers à uploader
-        if( nbFiles > 0 ):
-
-            #On marque tout ces fichiers comme "En file"
-            sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
-
-
-            #Envoie la file à gerer
-            trans.upload_ftp(res,logger,conf)
-
-
-
-#Méthode de nettoyage des fichiers uploadés
-def cleaner_timer(tempo,conf):
-
-    global gl_rotation_clean
-    gl_rotation_clean   =   gl_rotation_clean+1
-
-    if ((gl_rotation_clean)%conf.getint("GLOBAL","NB_CYCLE_ROTATION_CLEANER") == 0) & (conf.getint("GLOBAL","ENABLE_ROTATION") == 1):
-
-        #Fin du fils on le fork
-        pid = os.fork()
-        if pid:
-            logger.info("%s -- INFO -- Rotation du process Cleaner -- "% (strftime('%c',localtime())) )
-            sys.exit(os.EX_OK)
-
-        else:
-            logger.info("%s -- INFO -- je suis le nouveau process Cleaner -- "% (strftime('%c',localtime())) )
-            gl_rotation_clean = 0
-            cleaner_timer(tempo,conf)
-
-    else:
-        #instanciation à la base
-        sql  =   acces_bd.Sql()
-
-        #Paramétres de connection
-        sql.set_db(conf.get("DDB", "DATABASE"))
-        sql.set_host(conf.get("DDB", "HOST"))
-        sql.set_user(conf.get("DDB", "USER"))
-        sql.set_password(conf.get("DDB", "PASSWORD"))
-        #connection effective
-        sql.conn()
-
-        #Timer par defaut */5 minutes
-        threading.Timer(tempo, cleaner_timer, [tempo,conf]).start()
-
-        #Recupére les images à transferer ( nouvelles + écouées )
-        res =   sql.execute("\
-            SELECT \
-            "+str(conf.get("DDB","CHAMP_ID"))+",\
-            "+str(conf.get("DDB","CHAMP_IMG"))+",\
-            "+str(conf.get("DDB","CHAMP_SOURCE"))+"\
-            FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
-            WHERE "+str(conf.get("DDB","CHAMP_ETAT"))+" in (3)\
-            AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > "+str(conf.get("GLOBAL","JOURS_RETENTION")) )
-
-        if( len(res) > 0 ):
             for file in res:
+                listeid.append(str(file[0]))
 
-                #print ("Nettoyage de : "+str(file[2])+"/"+str(file[1])+"\n")
-                logger.info("%s -- INFO -- Nettoyage de : %s / %s -- "% (strftime('%c',localtime()),str(file[2]),str(file[1])) )
+            #compte le nombre de resultats trouvés
+            nbFiles =   len(res)
 
-                try:
+            #log du nombre de fichiers à traiter
+            logger.info("%s -- INFO -- Fichiers à traiter : %s -- "% (strftime('%c',localtime()),str(nbFiles) ) )
 
-                    os.remove(str(file[2])+"/"+str(file[1]))
-                    #On marque tout ces fichiers comme "nettoyé"
-                    sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
-                    SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 33 \
-                    WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+str(file[0])+")")
-                except:
-                    #marque le fichier comme impossible à nettoyer
-                    sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
-                    SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 304 \
-                    WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+str(file[0])+")")
-                    warnings.warn("Impossible de supprimer un fichier !\n")
+            #lancement uniquement sil y a des fichiers à uploader
+            if( nbFiles > 0 ):
+
+                #On marque tout ces fichiers comme "En file"
+                sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
+
+
+                #Envoie la file à gerer
+                trans.upload_ftp(res,logger,conf)
+
+            #Pause
+            sleep(tempo)
+
+
+
+
+
+class MainCleaner(threading.Thread):
+
+
+    def __init__(self,tempo,conf,logger):
+
+        self.tempo  =   tempo
+        self.conf   =   conf
+        self.logger =   logger
+        
+        #initialisation du thread
+        threading.Thread.__init__(self)
+
+    #action du thread ( start )
+    def run(self):
+        self.cleaner_timer(self.tempo,self.conf,self.logger)
+
+
+    #Méthode de nettoyage des fichiers uploadés
+    def cleaner_timer(self, tempo,conf,logger):
+
+        while True:
+
+            #instanciation à la base
+            sql  =   acces_bd.Sql(logger)
+
+            #Paramétres de connection
+            sql.set_db(conf.get("DDB", "DATABASE"))
+            sql.set_host(conf.get("DDB", "HOST"))
+            sql.set_user(conf.get("DDB", "USER"))
+            sql.set_password(conf.get("DDB", "PASSWORD"))
+            #connection effective
+            sql.conn()
+
+            #Recupére les images à transferer ( nouvelles + écouées )
+            res =   sql.execute("\
+                SELECT \
+                "+str(conf.get("DDB","CHAMP_ID"))+",\
+                "+str(conf.get("DDB","CHAMP_IMG"))+",\
+                "+str(conf.get("DDB","CHAMP_SOURCE"))+"\
+                FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
+                WHERE "+str(conf.get("DDB","CHAMP_ETAT"))+" in (3)\
+                AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > "+str(conf.get("GLOBAL","JOURS_RETENTION")) )
+
+            if( len(res) > 0 ):
+                for file in res:
+
+                    #print ("Nettoyage de : "+str(file[2])+"/"+str(file[1])+"\n")
+                    logger.info("%s -- INFO -- Nettoyage de : %s / %s -- "% (strftime('%c',localtime()),str(file[2]),str(file[1])) )
+
+                    try:
+
+                        os.remove(str(file[2])+"/"+str(file[1]))
+                        #On marque tout ces fichiers comme "nettoyé"
+                        sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
+                        SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 33 \
+                        WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+str(file[0])+")")
+                    except:
+                        #marque le fichier comme impossible à nettoyer
+                        sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
+                        SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 304 \
+                        WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+str(file[0])+")")
+                        warnings.warn("Impossible de supprimer un fichier !\n")
+
+            #Pause
+            sleep(tempo)
 
 
 
@@ -223,10 +220,41 @@ if __name__ == "__main__":
         trans   =   launch.Transfert()
 
         #Lancement main go go go
-        maintimer(conf.getint("GLOBAL", "TIMER"), trans, conf, logger)
+        pyt_thread = MainPytransfert(conf.getint("GLOBAL", "TIMER"), trans, conf, logger)
+        pyt_thread.start()
 
         #Gestion du nettoyae automatique
-        cleaner_timer(conf.getint("GLOBAL","CLEANER_TIMER"),conf)
+        cln_thread  =   MainCleaner(conf.getint("GLOBAL","CLEANER_TIMER"),conf, logger)
+        cln_thread.start()
+
+        #Verification du bon fonctionnement des threads
+        while True:
+
+            if pyt_thread.is_alive() != True :
+
+                logger.info("%s -- DEBUG -- Tread main stopé , restart ...  -- "% (strftime('%c',localtime())) )
+
+                del pyt_thread
+                pyt_thread = MainPytransfert(conf.getint("GLOBAL", "TIMER"), trans, conf, logger)
+                pyt_thread.start()
+
+            else:
+                logger.info("%s -- DEBUG -- Tread main is alive ...  -- "% (strftime('%c',localtime())) )
+
+            if cln_thread.is_alive() != True :
+
+                logger.info("%s -- DEBUG -- Tread cleaner stopé , restart ...  -- "% (strftime('%c',localtime())) )
+
+                del cln_thread
+                cln_thread  =   MainCleaner(conf.getint("GLOBAL","CLEANER_TIMER"),conf, logger)
+                cln_thread.start()
+
+            else:
+                logger.info("%s -- DEBUG -- Tread cleaner is alive ...  -- "% (strftime('%c',localtime())) )
+
+            #Prochain check dans 2 minutes
+            sleep(conf.getint("GLOBAL","CHECK_THREAD_TIMER"))
+
 
         
 

@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 
 import MySQLdb
+from time import strftime, localtime
 
 class Sql:
 
@@ -16,11 +17,13 @@ class Sql:
 
 
     #Constructeur connection à la base
-    #def __init__(self):
+    def __init__(self,logger):
+        self.logger =   logger
     #    return none
 
     #destructeur fermeture de la connection
     def __del__(self):
+        self.logger.info("%s -- DEBUG -- Fermeture connexion SQL ...  -- "% (strftime('%c',localtime())) )
         self.conn.close()
 
 

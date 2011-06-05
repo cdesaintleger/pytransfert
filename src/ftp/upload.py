@@ -48,7 +48,7 @@ class MyFtp(Thread):
         self.sql.set_user(conf.get("DDB", "USER"))
         self.sql.set_password(conf.get("DDB", "PASSWORD"))
         #connection effective
-        self.sql.conn()
+        self.sql.conn(logger)
         
 
         #mise en place du logger

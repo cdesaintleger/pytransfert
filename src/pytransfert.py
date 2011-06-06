@@ -45,6 +45,8 @@ class MainPytransfert(threading.Thread):
 
         while True:
 
+            self.logger.info("%s -- DEBUG -- Reveil du thread MainPytransfert ...  -- "% (strftime('%c',localtime())) )
+
             #instanciation à la base
             sql  =   acces_bd.Sql(logger)
 
@@ -89,6 +91,8 @@ class MainPytransfert(threading.Thread):
                 #Envoie la file à gerer
                 trans.upload_ftp(res,logger,conf)
 
+            self.logger.info("%s -- DEBUG -- Mise en pause du thread MainPytransfert ...  -- "% (strftime('%c',localtime())) )
+
             #Pause
             sleep(tempo)
 
@@ -117,6 +121,8 @@ class MainCleaner(threading.Thread):
     def cleaner_timer(self, tempo,conf,logger):
 
         while True:
+
+            self.logger.info("%s -- DEBUG -- Reveil du thread MainCleaner ...  -- "% (strftime('%c',localtime())) )
 
             #instanciation à la base
             sql  =   acces_bd.Sql(logger)
@@ -158,6 +164,8 @@ class MainCleaner(threading.Thread):
                         SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 304 \
                         WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+str(file[0])+")")
                         warnings.warn("Impossible de supprimer un fichier !\n")
+
+            self.logger.info("%s -- DEBUG -- Mise en pause du thread MainCleaner ...  -- "% (strftime('%c',localtime())) )
 
             #Pause
             sleep(tempo)

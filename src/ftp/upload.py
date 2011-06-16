@@ -82,8 +82,9 @@ class MyFtp(Thread):
                 except MySQLdb.Error, e: 
                     self.logger.info( "%s -- ERR -- Error %d: %s" % (strftime('%c',localtime()), e.args[0], e.args[1]) )
 
-                #notification 
-                self.notify_by_mail('data_newfilenotify')
+                #notification
+                if( self.conf.getint("NOTIFY","NOTIFY_NEW_FILE") == 1 ):#NOTIFY_NEW_FILE
+                    self.notify_by_mail('data_newfilenotify')
                 self.logger.info("%s -- INFO -- Notify new file -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
             else:

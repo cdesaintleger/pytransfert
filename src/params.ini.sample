@@ -4,7 +4,7 @@ TIMER   =   nombre de secondes entre chaque verif de nouveaux fichiers à upload
 NBTHREAD=   nombre de upload simultané
 CLEANER_TIMER   =   temps entre caque rotation du process de nettoyage
 JOURS_RETENTION =   nombre de jours de retention des fichiers sur le serveur
-HECK_THREAD_TIMER = temps en secondes entre chaque vérification des thread ( is alive )
+CHECK_THREAD_TIMER = temps en secondes entre chaque vérification des thread ( is alive )
 
 [LOG]
 LEVEL   =   niveau de log .. pas encore en fonction
@@ -31,6 +31,7 @@ USER    =   login
 PASSWORD=   mot de passe
 
 [NOTIFY]
+NOTIFY_NEW_FILE =   1|0 active ou non la notification de nouveau fichier
 NEWFILEFROM =   adresse de l'expediteur pour la notification nouveau fichier
 NEWFILEDEST =   adresse du destinataire pour la notification nouveau fichier
 NEWFILESUBJECT  =   sujet

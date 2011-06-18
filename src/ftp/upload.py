@@ -86,7 +86,7 @@ class MyFtp(Thread):
                 #notification
                 if( self.conf.getint("NOTIFY","NOTIFY_NEW_FILE") == 1 ):#NOTIFY_NEW_FILE
                     self.notify_by_mail('data_newfilenotify')
-                self.logger.info("%s -- INFO -- Notify new file -- %s"% (strftime('%c',localtime()), self.file[1]) )
+                    self.logger.info("%s -- INFO -- Notify new file -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
             else:
                 #remet l'etat du fichier à 0 pour reesayer

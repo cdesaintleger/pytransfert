@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
         # Set up a specific logger with our desired output level
         logger = logging.getLogger('pyTransfert')
-        logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.ERROR)
 
         # Add the log message handler to the logger
         handler = logging.handlers.RotatingFileHandler(

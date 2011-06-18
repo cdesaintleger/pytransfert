@@ -84,6 +84,8 @@ class MainPytransfert(threading.Thread):
             #lancement uniquement sil y a des fichiers à uploader
             if( nbFiles > 0 ):
 
+                logger.info("-- SQL -- UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
+
                 #On marque tout ces fichiers comme "En file"
                 sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
 

@@ -87,8 +87,9 @@ class MainPytransfert(threading.Thread):
                 logger.info("-- SQL -- UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
 
                 #On marque tout ces fichiers comme "En file"
-                sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
+                nb_affect   =   sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
 
+                logger.info("-- SQL RES -- %s enregistrement(s) affectes"%str(nb_affect))
 
                 #Envoie la file à gerer
                 trans.upload_ftp(res,logger,conf)

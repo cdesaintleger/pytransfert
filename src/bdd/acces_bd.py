@@ -53,12 +53,11 @@ class Sql:
 
         
         cursor = self.conn.cursor()
-        cursor.execute(sql)
+        res = cursor.execute(sql)
 
         if( type == "select" ):
             res    =   cursor.fetchall()
-            cursor.close()
-        else:
-            res    =    null
+
+        cursor.close()
 
         return res

@@ -47,6 +47,7 @@ class MyFtp(Thread):
         self.sql.set_host(conf.get("DDB", "HOST"))
         self.sql.set_user(conf.get("DDB", "USER"))
         self.sql.set_password(conf.get("DDB", "PASSWORD"))
+        self.sql.set_db_engine(conf.get("DDB", "ENGINE"))
         #connection effective
         self.sql.conn()
         

@@ -10,6 +10,7 @@ class Sql:
     __DB_HOST = ''
     __DB_USER = ''
     __DB_PASSWORD = ''
+    __DB_ENGINE = ''
     
 
     #ressource vers la ddb
@@ -42,6 +43,9 @@ class Sql:
 
     def set_password(self,value):
         self.__DB_PASSWORD  =   value
+        
+    def set_db_engine(self,value):
+        self.__DB_ENGINE    =   value
 
     
     def conn(self):
@@ -54,6 +58,9 @@ class Sql:
         
         cursor = self.conn.cursor()
         res = cursor.execute(sql)
+
+        if( self.__DB_ENGINE == "innodb" ):
+            self.conn.commit()
 
         if( type == "select" ):
             res    =   cursor.fetchall()

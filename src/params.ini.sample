@@ -15,6 +15,7 @@ HOST    =   ip serveur mysql
 DATABASE=   nom de la base de données
 USER    =   utilisateur ddb
 PASSWORD=   mot de passe
+ENGINE  =   myisam | innodb
 
 TBL_ETAT    =   nom de la table qui gére les états des transferts
 CHAMP_ID    =   nom du champ index des fichiers à uploader

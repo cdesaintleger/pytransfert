@@ -55,6 +55,7 @@ class MainPytransfert(threading.Thread):
             sql.set_host(conf.get("DDB", "HOST"))
             sql.set_user(conf.get("DDB", "USER"))
             sql.set_password(conf.get("DDB", "PASSWORD"))
+            sql.set_db_engine(conf.get("DDB", "ENGINE"))
             #connection effective
             sql.conn()
 
@@ -135,6 +136,7 @@ class MainCleaner(threading.Thread):
             sql.set_host(conf.get("DDB", "HOST"))
             sql.set_user(conf.get("DDB", "USER"))
             sql.set_password(conf.get("DDB", "PASSWORD"))
+            sql.set_db_engine(conf.get("DDB", "ENGINE"))
             #connection effective
             sql.conn()
 
@@ -217,7 +219,7 @@ if __name__ == "__main__":
 
         # Set up a specific logger with our desired output level
         logger = logging.getLogger('pyTransfert')
-        logger.setLevel(logging.ERROR)
+        logger.setLevel(logging.DEBUG)
 
         # Add the log message handler to the logger
         handler = logging.handlers.RotatingFileHandler(

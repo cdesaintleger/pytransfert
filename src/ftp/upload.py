@@ -4,7 +4,7 @@
 from threading import Thread
 
 #ftp
-#from ftplib import FTP, error_perm, all_errors
+import ftplib
 from libftputil import ftputil
 
 
@@ -20,10 +20,10 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-class MySession(FTP):
+class MySession(ftplib.FTP):
     def __init__(self, host, userid, password, port):
         """Act like ftplib.FTP's constructor but connect to another port."""
-        FTP.__init__(self)
+        ftplib.FTP.__init__(self)
         self.connect(host, port)
         self.login(userid, password)
 

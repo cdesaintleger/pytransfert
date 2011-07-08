@@ -20,10 +20,10 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-class MySession(ftplib.FTP):
+class MySession(FTP):
     def __init__(self, host, userid, password, port):
         """Act like ftplib.FTP's constructor but connect to another port."""
-        ftplib.FTP.__init__(self)
+        FTP.__init__(self)
         self.connect(host, port)
         self.login(userid, password)
 

@@ -114,7 +114,7 @@ class MyFtp(Thread):
         try:
 
             self.logger.info("%s -- INFO -- Connexion -- %s"% (strftime('%c',localtime()), self.file[4]) )
-            ftp =   ftputil.FTPHost( self.conf.get("FTP", "HOST"), self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"), self.conf.get("FTP", "PORT"))
+            ftp =   ftputil.FTPHost( self.conf.get("FTP", "HOST"), self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"), self.conf.getint("FTP", "PORT"))
             
             try:
                 #creation du repertoire destination

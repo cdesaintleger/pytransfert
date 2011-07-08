@@ -30,6 +30,7 @@ CHAMP_DATE  =   nom du champ contenant la date d'upload du fichier utilisé pour
 HOST    =   adresse ip du serveur FTP distant
 USER    =   login
 PASSWORD=   mot de passe
+PORT    =   21
 
 [NOTIFY]
 NOTIFY_NEW_FILE =   1|0 active ou non la notification de nouveau fichier

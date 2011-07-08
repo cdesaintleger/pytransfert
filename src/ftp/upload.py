@@ -20,6 +20,13 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+class MySession(ftplib.FTP):
+    def __init__(self, host, userid, password, port):
+        """Act like ftplib.FTP's constructor but connect to another port."""
+        ftplib.FTP.__init__(self)
+        self.connect(host, port)
+        self.login(userid, password)
+
 
 class MyFtp(Thread):
 
@@ -114,7 +121,7 @@ class MyFtp(Thread):
         try:
 
             self.logger.info("%s -- INFO -- Connexion -- %s"% (strftime('%c',localtime()), self.file[4]) )
-            ftp =   ftputil.FTPHost( self.conf.get("FTP", "HOST"), self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"), self.conf.getint("FTP", "PORT"))
+            ftp =   ftputil.FTPHost( self.conf.get("FTP", "HOST"), self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"), self.conf.getint("FTP", "PORT"), session_factory=MySession)
             
             try:
                 #creation du repertoire destination

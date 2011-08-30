@@ -55,10 +55,7 @@ class MyFtp(Thread):
         self.sql.set_user(conf.get("DDB", "USER"))
         self.sql.set_password(conf.get("DDB", "PASSWORD"))
         self.sql.set_db_engine(conf.get("DDB", "ENGINE"))
-        #connection effective
-        self.sql.conn()
         
-
         #mise en place du logger
         self.logger=logger
 
@@ -70,6 +67,9 @@ class MyFtp(Thread):
         
         #aquisition d'un jeton ( semaphore ) ou attente d'une libération
         self.sem.acquire()
+        
+        #connection effective
+        self.sql.conn()
 
         #Changement d'état en base => 2 upload en cours
         self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 2 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))

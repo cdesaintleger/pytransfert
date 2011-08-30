@@ -15,3 +15,5 @@ params.ini
 *.jpg
 *.pyc
 *.out
+.pydevproject
+.settings

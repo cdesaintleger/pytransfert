@@ -62,19 +62,21 @@ class MyFtp(Thread):
     #action du thread ( start )
     def run(self):
 
-        #Signale que l'on met en file le fichier
-        self.logger.info("%s -- INFO -- Attente du thread -- %s"% (strftime('%c',localtime()), self.file[1]) )
-        
-        #aquisition d'un jeton ( semaphore ) ou attente d'une libération
-        self.sem.acquire()
-        
-        #connection effective
-        self.sql.conn()
-
-        #Changement d'état en base => 2 upload en cours
-        self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 2 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
-
         try:
+            
+            #Signale que l'on met en file le fichier
+            self.logger.info("%s -- INFO -- Attente du thread -- %s"% (strftime('%c',localtime()), self.file[1]) )
+            
+            #aquisition d'un jeton ( semaphore ) ou attente d'une libération
+            self.sem.acquire()
+            
+            #connection effective
+            self.sql.conn()
+    
+            #Changement d'état en base => 2 upload en cours
+            self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 2 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
+
+            
             #jeton acquis , signalement du lancement de l'upload du fichier
             self.logger.info("%s -- INFO -- Execution du thread -- %s"% (strftime('%c',localtime()), self.file[1]) )
 

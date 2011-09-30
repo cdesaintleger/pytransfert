@@ -147,8 +147,10 @@ class MainCleaner(threading.Thread):
                 "+str(conf.get("DDB","CHAMP_IMG"))+",\
                 "+str(conf.get("DDB","CHAMP_SOURCE"))+"\
                 FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
-                WHERE "+str(conf.get("DDB","CHAMP_ETAT"))+" in (3,-3)\
-                AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > "+str(conf.get("GLOBAL","JOURS_RETENTION")) )
+                WHERE ( "+str(conf.get("DDB","CHAMP_ETAT"))+" in (3,-3)\
+                AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > "+str(conf.get("GLOBAL","JOURS_RETENTION"))+")\
+                OR ( "+str(conf.get("DDB","CHAMP_ETAT"))+" in (-1)\
+                AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > 3)" )
 
             if( len(res) > 0 ):
                 for file in res:

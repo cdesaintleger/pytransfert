@@ -139,8 +139,10 @@ class MainCleaner(threading.Thread):
             sql.set_db_engine(conf.get("DDB", "ENGINE"))
             #connection effective
             sql.conn()
+            
+            
 
-            #Recupére les images à transferer ( nouvelles + écouées )
+            #Recupére les images à transferer ( nouvelles + échouées )
             res =   sql.execute("\
                 SELECT \
                 "+str(conf.get("DDB","CHAMP_ID"))+",\
@@ -148,14 +150,43 @@ class MainCleaner(threading.Thread):
                 "+str(conf.get("DDB","CHAMP_SOURCE"))+"\
                 FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
                 WHERE ( "+str(conf.get("DDB","CHAMP_ETAT"))+" in (3,-3)\
-                AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > "+str(conf.get("GLOBAL","JOURS_RETENTION"))+")\
-                OR ( "+str(conf.get("DDB","CHAMP_ETAT"))+" in (-1)\
+                AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > "+str(conf.get("GLOBAL","JOURS_RETENTION"))+")" )
+            
+            
+            
+            
+            
+            #Récupére les fichiers panier > 3jours
+            res_panier  =   sql.execute("\
+                SELECT \
+                "+str(conf.get("DDB","CHAMP_ID"))+",\
+                "+str(conf.get("DDB","CHAMP_IMG"))+",\
+                "+str(conf.get("DDB","CHAMP_SOURCE"))+"\
+                FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
+                WHERE ( "+str(conf.get("DDB","CHAMP_ETAT"))+" in (-1)\
                 AND TO_DAYS( NOW() ) - TO_DAYS("+str(conf.get("DDB","CHAMP_DATE"))+") > 3)" )
+            
+            
+            listeid_to_delete =  list()
+            if(len(res_panier) > 0):
+                
+                #Récupére les id des lignes à supprimer
+                for old_file in res_panier:
+                    
+                    logger.info("%s -- INFO -- Réouverture upload de : %s / %s -- "% (strftime('%c',localtime()),str(old_file[2]),str(old_file[1])) )
+                    listeid_to_delete.append(str(old_file[0]))
+                
+                #Fusion des resultats de requetes pour suppression physique des fichiers client
+                res = res+res_panier
+                
+                
+                
+                
+            
 
             if( len(res) > 0 ):
                 for file in res:
 
-                    #print ("Nettoyage de : "+str(file[2])+"/"+str(file[1])+"\n")
                     logger.info("%s -- INFO -- Nettoyage de : %s / %s -- "% (strftime('%c',localtime()),str(file[2]),str(file[1])) )
 
                     try:
@@ -171,6 +202,19 @@ class MainCleaner(threading.Thread):
                         SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 304 \
                         WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+str(file[0])+")")
                         warnings.warn("Impossible de supprimer un fichier !\n")
+                        
+                        
+                        
+                        
+            #Ouverture des espace d'upload pour le panier agé de plus de 3 jours            
+            if( len(res_panier)>0 ):
+                
+                #Suppression des enregistrements en base ( paniers expirés )
+                sql.execute("\
+                            DELETE FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
+                            WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid_to_delete)+")\
+                ")
+            
 
             self.logger.info("%s -- DEBUG -- Mise en pause du thread MainCleaner ...  -- "% (strftime('%c',localtime())) )
 

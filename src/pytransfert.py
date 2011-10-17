@@ -190,8 +190,10 @@ class MainCleaner(threading.Thread):
                     logger.info("%s -- INFO -- Nettoyage de : %s / %s -- "% (strftime('%c',localtime()),str(file[2]),str(file[1])) )
 
                     try:
+                        directory   =   str(file[2]).strip("/")
+                        fichier     =   str(file[1]).strip("/")
 
-                        os.remove(str(file[2])+"/"+str(file[1]))
+                        os.remove("/"+directory+"/"+fichier)
                         #On marque tout ces fichiers comme "nettoyé"
                         sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+"\
                         SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 33 \

@@ -93,7 +93,7 @@ class MainPytransfert(threading.Thread):
                 logger.info("-- SQL RES -- %s enregistrement(s) affectes"%str(nb_affect))
 
                 #Envoie la file à gerer
-                trans.upload_ftp(res,logger,conf)
+                trans.upload_ftp(res,logger,conf,sql)
 
             self.logger.info("%s -- DEBUG -- Mise en pause du thread MainPytransfert ...  -- "% (strftime('%c',localtime())) )
 

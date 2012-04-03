@@ -9,7 +9,7 @@ from libftputil import ftputil
 
 
 #logging
-from time import strftime, localtime
+from time import strftime, localtime, sleep
 
 #ftp
 from bdd import acces_bd
@@ -20,20 +20,17 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-class MySession(ftplib.FTP):
-    def __init__(self, host, userid, password, port):
-        """Act like ftplib.FTP's constructor but connect to another port."""
-        ftplib.FTP.__init__(self)
-        self.connect(host, port)
-        self.login(userid, password)
 
 
 class MyFtp(Thread):
 
-    def __init__(self,sem,file,logger,conf):
+    def __init__(self,ftp,sem,file,logger,conf,sql):
 
         #initialisation du thread
         Thread.__init__(self)
+        
+        #récupére la session FTP
+        self.ftp    =   ftp
 
         #lecture du fichier de config
         self.conf    =   conf
@@ -47,14 +44,7 @@ class MyFtp(Thread):
         #Connexion SQL pour la changement des etats
 
         #instanciation à la base
-        self.sql  =   acces_bd.Sql(logger)
-
-        #Paramétres de connection
-        self.sql.set_db(conf.get("DDB", "DATABASE"))
-        self.sql.set_host(conf.get("DDB", "HOST"))
-        self.sql.set_user(conf.get("DDB", "USER"))
-        self.sql.set_password(conf.get("DDB", "PASSWORD"))
-        self.sql.set_db_engine(conf.get("DDB", "ENGINE"))
+        self.sql  =   sql
         
         #mise en place du logger
         self.logger=logger
@@ -69,9 +59,6 @@ class MyFtp(Thread):
             
             #aquisition d'un jeton ( semaphore ) ou attente d'une libération
             self.sem.acquire()
-            
-            #connection effective
-            self.sql.conn()
     
             #Changement d'état en base => 2 upload en cours
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 2 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
@@ -81,7 +68,7 @@ class MyFtp(Thread):
             self.logger.info("%s -- INFO -- Execution du thread -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
             #envoie du fichier au module FTP
-            cret = self._send_file()
+            cret = self._send_file(self.ftp)
             
             #test du code retour 0 = OK
             if(cret != 1):
@@ -111,26 +98,31 @@ class MyFtp(Thread):
 
             #libération du jeton pour laisser la place à un autre
             self.sem.release()
+            
 
 
     def keepalive(self,ftp):
         ftp.keep_alive()
 
     #Méthode _send_file gére les transactions avec le serveur FTP 
-    def _send_file(self):
+    def _send_file(self,ftp):
 
 
         try:
 
-            self.logger.info("%s -- INFO -- Connexion -- %s"% (strftime('%c',localtime()), self.file[4]) )
-            ftp =   ftputil.FTPHost( self.conf.get("FTP", "HOST"), self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"), self.conf.getint("FTP", "PORT"), session_factory=MySession)
+            self.logger.info("%s -- INFO -- Debut -- %s"% (strftime('%c',localtime()), self.file[4]) )
+            #ftp =   ftputil.FTPHost( self.conf.get("FTP", "HOST"), self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"), self.conf.getint("FTP", "PORT"), session_factory=MySession)
             
             try:
+                #Retourne à la racine
+                ftp.chdir('/')
+                
                 #creation du repertoire destination
                 self.logger.info("%s -- INFO -- Creation repertoire -- %s"% (strftime('%c',localtime()), self.file[4]) )
-                ftp.mkdir(str(self.file[4]).strip('/'))
+                #ftp.mkdir(str(self.file[4]).strip('/'))    Creation de repertoire sans prise en compte des intermédiaires
+                ftp.makedirs(str(self.file[4]).strip('/'))
 
-            except OSError, resp:
+            except:
 
                 #si le repertoire existe déjà .. on signale et on passe
                 self.logger.info("%s -- WARN -- Repertoire deja existant -- %s"% (strftime('%c',localtime()), self.file[1]) )
@@ -176,10 +168,10 @@ class MyFtp(Thread):
 
             return 1
         
-        finally:
-
-            self.logger.info("%s -- INFO -- Deconnection du FTP -- %s"% (strftime('%c',localtime()), self.file[1]) )
-            ftp.close()
+        #finally:
+        #
+        #    self.logger.info("%s -- INFO -- Deconnection du FTP -- %s"% (strftime('%c',localtime()), self.file[1]) )
+        #    ftp.close()
 
 
     #Notification par mail de l'arrivé des fichiers ou d'un probléme quelconque

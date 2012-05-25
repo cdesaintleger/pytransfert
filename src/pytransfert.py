@@ -9,6 +9,8 @@ __date__ ="$05 Juin 2011 17:51:23$"
 
 #importation des lib necessaires
 from bdd import acces_bd
+import rq
+
 from transfert import launch
 import threading
 import ConfigParser
@@ -22,6 +24,10 @@ from time import strftime, localtime, sleep
 import logging
 import logging.handlers
 
+#Gestionnaire de la file
+from Queue import *
+queue = Queue()
+
   
 #############################################
 ##                                         ##
@@ -31,50 +37,24 @@ import logging.handlers
 
 class MainPytransfert(threading.Thread):
 
-    def __init__(self,tempo, trans, conf, logger):
+    def __init__(self,tempo, sql, conf, logger):
+        
         self.tempo  =   tempo
-        self.trans  =   trans
+        self.sql  =   sql
         self.conf   =   conf
         self.logger =   logger
         threading.Thread.__init__(self);
 
     def run(self):
-        self.maintimer(self.tempo, self.trans, self.conf, self.logger)
+        self.maintimer(self.tempo, self.sql, self.conf, self.logger)
 
-    def maintimer(self, tempo, trans, conf, logger):
+    def maintimer(self, tempo, sql, conf, logger):
 
         while True:
 
             self.logger.info("%s -- DEBUG -- Reveil du thread MainPytransfert ...  -- "% (strftime('%c',localtime())) )
 
-            #instanciation à la base
-            sql  =   acces_bd.Sql(logger)
-
-            #Paramétres de connection
-            sql.set_db(conf.get("DDB", "DATABASE"))
-            sql.set_host(conf.get("DDB", "HOST"))
-            sql.set_user(conf.get("DDB", "USER"))
-            sql.set_password(conf.get("DDB", "PASSWORD"))
-            sql.set_db_engine(conf.get("DDB", "ENGINE"))
-            #connection effective
-            sql.conn()
-
-            #Recupére les images à transferer ( nouvelles + écouées )
-            res =   sql.execute("\
-                SELECT "+str(conf.get("DDB","CHAMP_ID"))+",\
-                "+str(conf.get("DDB","CHAMP_IMG"))+",\
-                "+str(conf.get("DDB","CHAMP_CMD"))+",\
-                "+str(conf.get("DDB","CHAMP_SOURCE"))+",\
-                "+str(conf.get("DDB","CHAMP_DEST"))+"\
-                FROM "+str(conf.get("DDB","TBL_ETAT"))+"\
-                WHERE "+str(conf.get("DDB","CHAMP_ETAT"))+" in (0,500)")
-
-
-            #parcour des fichiers
-            listeid =  list()
-
-            for file in res:
-                listeid.append(str(file[0]))
+            res = rq.get_new_files(sql,conf)
 
             #compte le nombre de resultats trouvés
             nbFiles =   len(res)
@@ -84,17 +64,25 @@ class MainPytransfert(threading.Thread):
 
             #lancement uniquement sil y a des fichiers à uploader
             if( nbFiles > 0 ):
+                
+                
+                #parcour des fichiers
+                listeid =  list()
 
-                logger.info("-- SQL -- UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
+                #remonte le id
+                for file in res:
+                    listeid.append(str(file[0]))
+                
+                logger.info("-- SQL -- Mise en file des enregistrements :  "+','.join(listeid))
 
-                #On marque tout ces fichiers comme "En file"
-                nb_affect   =   sql.execute("UPDATE "+str(conf.get("DDB","TBL_ETAT"))+" SET "+str(conf.get("DDB","CHAMP_ETAT"))+" = 1 WHERE "+str(conf.get("DDB","CHAMP_ID"))+" in ("+','.join(listeid)+")")
-
-                logger.info("-- SQL RES -- %s enregistrement(s) affectes"%str(nb_affect))
-
-                #Envoie la file à gerer
-                trans.upload_ftp(res,logger,conf,sql)
-
+                #On marque tout ces fichiers comme "En file" etat = 1
+                rq.set_state(sql,conf,listeid,1)
+                
+                #Met les fichiers en file
+                for file in res:
+                    queue.put(file)
+                    listeid.append(str(file[0]))             
+                
             self.logger.info("%s -- DEBUG -- Mise en pause du thread MainPytransfert ...  -- "% (strftime('%c',localtime())) )
 
             #Pause
@@ -107,41 +95,29 @@ class MainPytransfert(threading.Thread):
 class MainCleaner(threading.Thread):
 
 
-    def __init__(self,tempo,conf,logger):
+    def __init__(self,tempo,sql,conf,logger):
 
         self.tempo  =   tempo
         self.conf   =   conf
         self.logger =   logger
+        self.sql    =   sql
         
         #initialisation du thread
         threading.Thread.__init__(self)
 
     #action du thread ( start )
     def run(self):
-        self.cleaner_timer(self.tempo,self.conf,self.logger)
+        self.cleaner_timer(self.tempo, self.sql, self.conf, self.logger)
 
 
     #Méthode de nettoyage des fichiers uploadés
-    def cleaner_timer(self, tempo,conf,logger):
+    def cleaner_timer(self, tempo, sql, conf, logger):
 
         while True:
 
             self.logger.info("%s -- DEBUG -- Reveil du thread MainCleaner ...  -- "% (strftime('%c',localtime())) )
 
-            #instanciation à la base
-            sql  =   acces_bd.Sql(logger)
-
-            #Paramétres de connection
-            sql.set_db(conf.get("DDB", "DATABASE"))
-            sql.set_host(conf.get("DDB", "HOST"))
-            sql.set_user(conf.get("DDB", "USER"))
-            sql.set_password(conf.get("DDB", "PASSWORD"))
-            sql.set_db_engine(conf.get("DDB", "ENGINE"))
-            #connection effective
-            sql.conn()
             
-            
-
             #Recupére les images à transferer ( nouvelles + échouées )
             res =   sql.execute("\
                 SELECT \
@@ -243,24 +219,30 @@ if __name__ == "__main__":
     #Détache le process fils
     pid = os.fork()
     if pid:
-        print ">>> Le Pére: Fils ou es tu ? ... je te quitte nous nous retrouverons au prochain reboot ..."
+        
+        print ">>> Le Pére: Fils "+str(pid)+" ou es tu ? ... je te quitte nous nous retrouverons au prochain reboot ..."
+        
+        # Parent, write PID file
+        fp = open('pytransfert.pid', 'w')
+        fp.write(str(pid))
+        fp.flush()
+
+        # Forcibly sync disk
+        os.fsync(fp.fileno())
+        fp.close()
+
+        os._exit(0)
+        
         sys.exit(os.EX_OK)
 
     else:
-        print ">>> Le Fils ( pid: "+str(pid)+" ): Pére je suis là ... je vais méner la mission à bien ne t'en fait pas ... mon créaeur est un génie .. ' oulà .. les chevilles :p  '"
-
+        
+        print ">>> Le Fils ( pid: "+str(os.getpid())+" ): Pére je suis là ... je vais méner la mission à bien ne t'en fait pas ... mon créaeur est un génie .. ' oulà .. les chevilles :p  '"
         print ">>> Répertoire de travail : "+os.getcwd()
-
-        # Decouple from parent environment
-        os.chdir(os.getcwd())
-        os.setsid()
-        os.umask(022)
 
         #lecture du fichier de config
         conf    =   ConfigParser.ConfigParser()
         conf.read("params.ini")
-
-
 
         #mise en place du logger
         LOG_FILENAME = 'log/pytransfert.out'
@@ -277,43 +259,69 @@ if __name__ == "__main__":
 
 
 
-        #Instanciation du transfert par thread
-        trans   =   launch.Transfert()
 
-        #Lancement main go go go
-        pyt_thread = MainPytransfert(conf.getint("GLOBAL", "TIMER"), trans, conf, logger)
+        #instanciation à la base
+        sql  =   acces_bd.Sql(logger)
+
+        #Paramétres de connection
+        sql.set_db(conf.get("DDB", "DATABASE"))
+        sql.set_host(conf.get("DDB", "HOST"))
+        sql.set_user(conf.get("DDB", "USER"))
+        sql.set_password(conf.get("DDB", "PASSWORD"))
+        sql.set_db_engine(conf.get("DDB", "ENGINE"))
+        #connection effective
+        sql.conn()
+
+
+
+        #Lancement des workers
+        workers =   []
+        for i in range(conf.getint("GLOBAL","NBTHREAD")):
+            
+            worker   =   launch.Worker(logger,conf,sql,queue)
+            worker.start()
+            workers.append(worker)
+            
+            
+        #Lancement main qui s'occupe de remplir la file queue
+        pyt_thread = MainPytransfert(conf.getint("GLOBAL", "TIMER"), sql, conf, logger)
         pyt_thread.start()
 
         #Gestion du nettoyae automatique
-        cln_thread  =   MainCleaner(conf.getint("GLOBAL","CLEANER_TIMER"),conf, logger)
+        cln_thread  =   MainCleaner(conf.getint("GLOBAL","CLEANER_TIMER"), sql, conf, logger)
         cln_thread.start()
-
+        
+        
+        
+        
         #Verification du bon fonctionnement des threads
         while True:
 
-            if pyt_thread.is_alive() != True :
+            if pyt_thread.isAlive() != True :
 
-                logger.info("%s -- DEBUG -- Tread main stopé , restart ...  -- "% (strftime('%c',localtime())) )
+                logger.info("%s -- WARN -- Tread main stopé , restart ...  -- "% (strftime('%c',localtime())) )
 
                 del pyt_thread
-                pyt_thread = MainPytransfert(conf.getint("GLOBAL", "TIMER"), trans, conf, logger)
+                pyt_thread = MainPytransfert(conf.getint("GLOBAL", "TIMER"), sql, conf, logger)
                 pyt_thread.start()
+                
 
             else:
+                
                 logger.info("%s -- DEBUG -- Tread main is alive ...  -- "% (strftime('%c',localtime())) )
 
             if cln_thread.is_alive() != True :
 
-                logger.info("%s -- DEBUG -- Tread cleaner stopé , restart ...  -- "% (strftime('%c',localtime())) )
+                logger.info("%s -- WARN -- Tread cleaner stopé , restart ...  -- "% (strftime('%c',localtime())) )
 
                 del cln_thread
-                cln_thread  =   MainCleaner(conf.getint("GLOBAL","CLEANER_TIMER"),conf, logger)
+                cln_thread  =   MainCleaner(conf.getint("GLOBAL","CLEANER_TIMER"), sql, conf, logger)
                 cln_thread.start()
 
             else:
                 logger.info("%s -- DEBUG -- Tread cleaner is alive ...  -- "% (strftime('%c',localtime())) )
 
-            #Prochain check dans 2 minutes
+            #Prochain check dans x minutes
             sleep(conf.getint("GLOBAL","CHECK_THREAD_TIMER"))
 
 

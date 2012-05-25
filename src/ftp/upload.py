@@ -24,7 +24,7 @@ from email.mime.text import MIMEText
 
 class MyFtp(Thread):
 
-    def __init__(self,ftp,sem,file,logger,conf,sql):
+    def __init__(self,ftp,file,logger,conf,sql):
 
         #initialisation du thread
         Thread.__init__(self)
@@ -35,16 +35,28 @@ class MyFtp(Thread):
         #lecture du fichier de config
         self.conf    =   conf
 
-        #recupération de jetons ( semaphore )
-        self.sem = sem
-
         #recupre le fichier à uploader
         self.file   =   file
 
         #Connexion SQL pour la changement des etats
 
         #instanciation à la base
-        self.sql  =   sql
+        #self.sql  =   sql
+        
+        
+        #instanciation à la base
+        self.sql   =   acces_bd.Sql(logger)
+
+        #Paramétres de connection
+        self.sql.set_db(conf.get("DDB", "DATABASE"))
+        self.sql.set_host(conf.get("DDB", "HOST"))
+        self.sql.set_user(conf.get("DDB", "USER"))
+        self.sql.set_password(conf.get("DDB", "PASSWORD"))
+        self.sql.set_db_engine(conf.get("DDB", "ENGINE"))
+        #connection effective
+        self.sql.conn()
+        
+        
         
         #mise en place du logger
         self.logger=logger
@@ -56,9 +68,7 @@ class MyFtp(Thread):
             
             #Signale que l'on met en file le fichier
             self.logger.info("%s -- INFO -- Attente du thread -- %s"% (strftime('%c',localtime()), self.file[1]) )
-            
-            #aquisition d'un jeton ( semaphore ) ou attente d'une libération
-            self.sem.acquire()
+
     
             #Changement d'état en base => 2 upload en cours
             self.sql.execute("UPDATE "+str(self.conf.get("DDB","TBL_ETAT"))+" SET "+str(self.conf.get("DDB","CHAMP_ETAT"))+" = 2 WHERE "+str(self.conf.get("DDB","CHAMP_ID"))+" = "+str(self.file[0]))
@@ -96,11 +106,6 @@ class MyFtp(Thread):
             #signalement de la fin de l'upload donc du thread
             self.logger.info("%s -- INFO -- Fin du thread -- %s"% (strftime('%c',localtime()), self.file[1]) )
 
-            #libération du jeton pour laisser la place à un autre
-            self.sem.release()
-            
-
-
     def keepalive(self,ftp):
         ftp.keep_alive()
 
@@ -115,7 +120,7 @@ class MyFtp(Thread):
             
             try:
                 #Retourne à la racine
-                ftp.chdir('/')
+                #ftp.chdir('/')
                 
                 #creation du repertoire destination
                 self.logger.info("%s -- INFO -- Creation repertoire -- %s"% (strftime('%c',localtime()), self.file[4]) )
@@ -167,11 +172,6 @@ class MyFtp(Thread):
             self.notify_by_mail('data_emergencynotify')
 
             return 1
-        
-        #finally:
-        #
-        #    self.logger.info("%s -- INFO -- Deconnection du FTP -- %s"% (strftime('%c',localtime()), self.file[1]) )
-        #    ftp.close()
 
 
     #Notification par mail de l'arrivé des fichiers ou d'un probléme quelconque

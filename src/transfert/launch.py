@@ -1,8 +1,9 @@
 # -*- coding: utf8 -*-
-from threading import Thread, BoundedSemaphore
-import ConfigParser
+from threading import Thread
+
 from ftp import upload
 import time
+
 
 #ftp
 import ftplib
@@ -10,6 +11,7 @@ from libftputil import ftputil
 
 #logging
 from time import strftime, localtime
+
 
 class MySession(ftplib.FTP):
     
@@ -19,53 +21,62 @@ class MySession(ftplib.FTP):
         self.connect(host, port)
         self.login(userid, password)
         
-        
+   
 
-class Transfert(Thread):
+
+
+class Worker(Thread):
     
         
-    def __init__(self):
-
-        #lecture du fichier de config
-        self.conf    =   ConfigParser.ConfigParser()
-        self.conf.read("params.ini")
-
-        #définition du sémaphore ( nb upload simu. )
-        self.sem =   BoundedSemaphore(self.conf.getint("GLOBAL","NBTHREAD"))
+    def __init__(self,logger,conf,sql,queue):
+        
+        #initialisation du thread
+        Thread.__init__(self)
+        
+        #recupération du handle sur le fichier de config
+        self.conf       =   conf
+        #Recuperation du handle sur le gestionnaire de logs
+        self.logger     =   logger
+        
+        #recupere le main sur la connexion sql
+        self.sql    =   sql
+        
+        #Remonte la queue
+        self.queue  =   queue
         
         
+    def run(self):
         
-    def upload_ftp(self,list,logger,conf,sql):
         
-        #tableau des threads
-        ThUp    =   []
-        
-        logger.info("%s -- INFO -- connection au FTP "% (strftime('%c',localtime())) )
-        #Une seule connexion FTP par session 
-        ftp =   ftputil.FTPHost( self.conf.get("FTP", "HOST"), self.conf.get("FTP", "USER"), self.conf.get("FTP", "PASSWORD"), self.conf.getint("FTP", "PORT"), session_factory=MySession)
-        
-        #parcour des fichiers
-        for file in list:
+        while True:
             
-            #upload du fichier par un thread
-            mup =   upload.MyFtp(ftp,self.sem,file,logger,conf,sql)
+            #Attend un fichier à traiter
+            file    =   self.queue.get()
+            
+            self.logger.info("%s -- INFO -- Recuperation d'un fichier a traiter "% (strftime('%c',localtime())) )
+            
+            self.logger.info("%s -- INFO -- connection au FTP "% (strftime('%c',localtime())) )
+            
+            #Une seule connexion FTP par session 
+            ftp =   ftputil.FTPHost(
+                self.conf.get("FTP", "HOST"),
+                self.conf.get("FTP", "USER"),
+                self.conf.get("FTP", "PASSWORD"),
+                self.conf.getint("FTP", "PORT"),
+                session_factory=MySession)
+            
+            
+            mup =   upload.MyFtp(ftp,file,self.logger,self.conf,self.sql)
             mup.start()
-            ThUp.append( mup )
             
+            #Attente de la fin du transfert
+            mup.join()
             
-        #Tant qu'un thread est actif
-        while len( ThUp ) > 0:
+            #Fermeture de la connexion FTP
+            ftp.close()
+            del(ftp)
             
+            self.logger.info("%s -- INFO -- de-connection du FTP "% (strftime('%c',localtime())) )
             
-            logger.info("%s -- INFO -- Threads en cours :  -- %s"% (strftime('%c',localtime()),str(len( ThUp ))) )
-            
-            for (key,th) in enumerate(ThUp):
-                if not th.isAlive():
-                    del(ThUp[key])
-                    
-            time.sleep(1)
-                    
-        logger.info("%s -- INFO -- Deconnection du FTP -- "% (strftime('%c',localtime())) )
-        ftp.close()
-
-           
+            #Notifi la file (queue) que le travail est terminé
+            self.queue.task_done()
